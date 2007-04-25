@@ -5,7 +5,7 @@ use Moose 'blessed';
 use Moose::Util::TypeConstraints ();
 use Params::Validate ();
 
-our $VERSION   = '0.01';
+our $VERSION   = '0.02';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import {
@@ -31,6 +31,24 @@ sub import {
         
         return (($instance ? $instance : ()), %args);        
     });
+    
+    $pkg->meta->alias_method('validatep' => sub {
+        my ($args, @params) = @_;
+        
+        my %params         = @params;
+        my @ordered_params = grep { exists $params{$_} } @params;
+        
+        # prepare the parameters ...
+        $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
+            foreach keys %params;
+            
+        my $instance;
+        $instance = shift @$args if blessed $args->[0];
+        
+        my %args = Params::Validate::validate(@$args, \%params);
+        
+        return (($instance ? $instance : ()), @args{@ordered_params});        
+    });    
 }
 
 sub _convert_to_param_validate_spec {
@@ -131,18 +149,18 @@ MooseX::Params::Validate - an extension of Params::Validate for using Moose's ty
   }
   
   sub bar {
-      my $self   = shift;
-      my %params = validate(\@_, 
+      my $self = shift;
+      my ($foo, $baz) = validatep(\@_, 
           foo => { isa => 'Foo' },                    
           baz => { isa => 'ArrayRef | HashRef', optional => 1 }                        
       );
-      [ $params{foo}, $params{baz} ];
+      [ $foo, $baz ];
   }
 
 =head1 DESCRIPTION
 
 This module fills a gap in Moose by adding method parameter validation 
-to Moose. This is just one of many developing options, it should be 
+to Moose. This is just one of many developing options, it should not be 
 considered the "official" one by any means though. 
 
 This is an early release of this module, and many things will likely 
@@ -161,6 +179,11 @@ for what it is.
 =over 4
 
 =item B<validate (\@_, %parameter_spec)>
+
+This behaves similar to the standard Params::Validate C<validate> function
+and returns the captured values in a HASH. The one exception being that 
+if it spots an instance in the C<@_>, then it will handle it appropriately
+(unlike Params::Validate which forces you to shift you C<$self> first). 
 
 The C<%parameter_spec> accepts the following options:
 
@@ -187,6 +210,24 @@ specified. This option is passed directly to Params::Validate.
 =back
 
 The plan is to support more options in the future as well. 
+
+=item B<validatep (\@_, %parameter_spec)>
+
+The C<%parameter_spec> accepts the same options as above, but returns the 
+parameters as positional values instead of a HASH. This is best explained 
+by example:
+
+  sub foo {
+      my ($self, $foo, $bar) = validatep(\@_, 
+          foo => { isa => 'Foo' },                    
+          bar => { isa => 'Bar' },        
+      );
+      $foo->baz($bar);
+  }
+
+We capture the order in which you defined the parameters and then return 
+them as positionals in the same order. If a param is marked optional and 
+not included, then it will be set to C<undef>.
 
 =back
 

@@ -8,5 +8,6 @@ README
 lib/MooseX/Params/Validate.pm
 t/000_load.t
 t/001_basic.t
+t/002_basic_positional.t
 t/pod.t
 t/pod_coverage.t

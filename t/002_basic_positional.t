@@ -27,29 +27,29 @@ BEGIN {
     with 'Roles::Blah';
 
     sub foo {
-        my ($self, %params) = validate(\@_, 
+        my ($self, $bar) = validatep(\@_, 
             bar => { isa => 'Str', default => 'Moose' },
         );
-        return "Horray for $params{bar}!";
+        return "Horray for $bar!";
     }
     
     sub bar {
-        my $self   = shift;
-        my %params = validate(\@_, 
+        my $self = shift;
+        my ($foo, $baz) = validatep(\@_, 
             foo => { isa => 'Foo' },                    
             baz => { isa => 'ArrayRef | HashRef', optional => 1 },                                
         );
-        [ $params{foo}, $params{baz} ];
+        [ $foo, $baz ];
     } 
     
     sub baz {
-        my $self   = shift;
-        my %params = validate(\@_,        
+        my $self = shift;
+        my ($foo, $bar, $boo) = validatep(\@_,        
             foo => { isa => subtype('Object' => where { $_->isa('Foo') }), optional => 1 }, 
             bar => { does => 'Roles::Blah', optional => 1 }, 
             boo => { does => subtype('Role' => where { $_->does('Roles::Blah') }), optional => 1 },                                      
         );
-        return $params{foo} || $params{bar} || $params{boo};
+        return $foo || $bar || $boo;
     }   
 }
 

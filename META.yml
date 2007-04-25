@@ -1,6 +1,6 @@
 ---
 name: MooseX-Params-Validate
-version: 0.01
+version: 0.02
 author:
   - 'Stevan Little E<lt>stevan.little@iinteractive.comE<gt>'
 abstract: an extension of Params::Validate for using Moose's types
@@ -16,7 +16,7 @@ build_requires:
 provides:
   MooseX::Params::Validate:
     file: lib/MooseX/Params/Validate.pm
-    version: 0.01
+    version: 0.02
 generated_by: Module::Build version 0.2805
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html

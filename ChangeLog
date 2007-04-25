@@ -1,4 +1,9 @@
 Revision history for Perl extension MooseX-Params-Validate
 
-0.01 Wed. April, 18, 2007
+0.02 Wed. April 25, 2007
+    - added validatep, which returns the captured
+      args as positional instead of as hash
+      - added docs and tests
+
+0.01 Wed. April 18, 2007
     - trying to fill a gap, we will see ...
