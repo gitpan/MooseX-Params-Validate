@@ -5,7 +5,7 @@ use Moose 'blessed';
 use Moose::Util::TypeConstraints ();
 use Params::Validate ();
 
-our $VERSION   = '0.02';
+our $VERSION   = '0.03';
 our $AUTHORITY = 'cpan:STEVAN';
 
 sub import {
@@ -15,7 +15,8 @@ sub import {
     return if $pkg eq 'main';
     
     return unless $pkg->can('meta')
-               && $pkg->meta->isa('Class::MOP::Class');
+               && $pkg->meta->isa('Class::MOP::Class') ||
+                  $pkg->meta->isa('Moose::Meta::Role');
     
     $pkg->meta->alias_method('validate' => sub {
         my ($args, %params) = @_;

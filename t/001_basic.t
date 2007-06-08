@@ -14,10 +14,17 @@ BEGIN {
 {
     package Roles::Blah;
     use Moose::Role;
+    use MooseX::Params::Validate;
     
-    requires 'foo';
     requires 'bar';
     requires 'baz';        
+    
+    sub foo {
+        my ($self, %params) = validate(\@_, 
+            bar => { isa => 'Str', default => 'Moose' },
+        );
+        return "Horray for $params{bar}!";
+    }    
     
     package Foo;
     use Moose;
@@ -25,13 +32,6 @@ BEGIN {
     use MooseX::Params::Validate;
 
     with 'Roles::Blah';
-
-    sub foo {
-        my ($self, %params) = validate(\@_, 
-            bar => { isa => 'Str', default => 'Moose' },
-        );
-        return "Horray for $params{bar}!";
-    }
     
     sub bar {
         my $self   = shift;
