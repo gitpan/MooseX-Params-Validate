@@ -6,7 +6,7 @@ my $build = Module::Build->new(
     module_name => 'MooseX::Params::Validate',
     license => 'perl',
     requires => {   
-        'Moose'            => '0.17',
+        'Moose'            => '0.33',
         'Params::Validate' => '0.88',
     },
     optional => {

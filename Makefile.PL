@@ -2,16 +2,16 @@
 use ExtUtils::MakeMaker;
 WriteMakefile
 (
-          'PL_FILES' => {},
-          'INSTALLDIRS' => 'site',
           'NAME' => 'MooseX::Params::Validate',
-          'EXE_FILES' => [],
           'VERSION_FROM' => 'lib/MooseX/Params/Validate.pm',
           'PREREQ_PM' => {
-                           'Test::More' => '0.62',
-                           'Test::Exception' => '0.21',
+                           'Moose' => '0.33',
                            'Params::Validate' => '0.88',
-                           'Moose' => '0.17'
-                         }
+                           'Test::Exception' => '0.21',
+                           'Test::More' => '0.62'
+                         },
+          'INSTALLDIRS' => 'site',
+          'EXE_FILES' => [],
+          'PL_FILES' => {}
         )
 ;

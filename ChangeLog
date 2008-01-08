@@ -1,5 +1,19 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.04 Tues. Jan. 8th, 2008
+    - upped the Moose dependency and added support
+      for the new improved Moose type constraints
+      - added tests for this
+    
+    - adding caching of the prepared parameter 
+      specs, this results in approx. 3x speedup 
+      using rough benchmarks. 
+      
+    - added special caching handlers see the 
+      IMPORTANT NOTE ON CACHING section of the 
+      POD for more details
+      - added tests for this
+
 0.03 Fri. June 8th, 2007
     - added support for using this 
       within role methods too.

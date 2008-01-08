@@ -1,12 +1,12 @@
-
 package MooseX::Params::Validate;
-
-use Moose 'blessed';
+use Moose 'blessed', 'confess';
 use Moose::Util::TypeConstraints ();
 use Params::Validate ();
 
-our $VERSION   = '0.03';
+our $VERSION   = '0.04';
 our $AUTHORITY = 'cpan:STEVAN';
+
+my %CACHED_PARAM_SPECS;
 
 sub import {
     my $class = shift;
@@ -21,9 +21,32 @@ sub import {
     $pkg->meta->alias_method('validate' => sub {
         my ($args, %params) = @_;
         
-        # prepare the parameters ...
-        $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
-            foreach keys %params;
+        my $cache_key;
+        if (exists $params{MX_PARAMS_VALIDATE_CACHE_KEY}) {
+            $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+            delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+        }
+        else {
+            $cache_key = (caller(1))[3];
+            ($cache_key =~ /^$pkg/)
+                || confess "You are doing something odd, I expect $cache_key to the the name of this sub";
+        }
+        
+        if (exists $CACHED_PARAM_SPECS{ $cache_key }) {
+            (ref $CACHED_PARAM_SPECS{ $cache_key } eq 'HASH')
+                || confess "I was expecting a HASH-ref in the cached $cache_key parameter" 
+                         . " spec, you are doing something funky, stop it!";
+            %params = %{ $CACHED_PARAM_SPECS{ $cache_key } };
+        }
+        else {
+            my $should_cache = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+            delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
+            # prepare the parameters ...
+            $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
+                foreach keys %params;
+            $CACHED_PARAM_SPECS{ $cache_key } = \%params 
+                if $should_cache;            
+        }
             
         my $instance;
         $instance = shift @$args if blessed $args->[0];
@@ -36,12 +59,40 @@ sub import {
     $pkg->meta->alias_method('validatep' => sub {
         my ($args, @params) = @_;
         
-        my %params         = @params;
-        my @ordered_params = grep { exists $params{$_} } @params;
+        my %params = @params;        
         
-        # prepare the parameters ...
-        $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
-            foreach keys %params;
+        my $cache_key;
+        if (exists $params{MX_PARAMS_VALIDATE_CACHE_KEY}) {
+            $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+            delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+        }
+        else {
+            $cache_key = (caller(1))[3];
+            ($cache_key =~ /^$pkg/)
+                || confess "You are doing something odd, I expect $cache_key to the the name of this sub";
+        }
+        
+        my @ordered_params;
+        if (exists $CACHED_PARAM_SPECS{ $cache_key }) {
+            (ref $CACHED_PARAM_SPECS{ $cache_key } eq 'ARRAY')
+                || confess "I was expecting a ARRAY-ref in the cached $cache_key parameter" 
+                         . " spec, you are doing something funky, stop it!";            
+            %params         = %{ $CACHED_PARAM_SPECS{ $cache_key }->[0] };
+            @ordered_params = @{ $CACHED_PARAM_SPECS{ $cache_key }->[1] };
+        }
+        else {
+            my $should_cache = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+            delete $params{MX_PARAMS_VALIDATE_NO_CACHE};            
+            
+            @ordered_params = grep { exists $params{$_} } @params;
+
+            # prepare the parameters ...
+            $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
+                foreach keys %params;
+
+            $CACHED_PARAM_SPECS{ $cache_key } = [ \%params, \@ordered_params ] 
+                if $should_cache;            
+        }        
             
         my $instance;
         $instance = shift @$args if blessed $args->[0];
@@ -69,25 +120,12 @@ sub _convert_to_param_validate_spec {
 			$constraint = $spec->{isa};
 		}
         else {
-            if ($spec->{isa} =~ /\|/) {
-    	        my @types = split /\s*\|\s*/ => $spec->{isa};
-    	        $constraint = Moose::Util::TypeConstraints::create_type_constraint_union(
-    	            @types
-    	        );
-    	    }        
-            else {
-                # otherwise assume it is a constraint
-    		    $constraint = Moose::Util::TypeConstraints::find_type_constraint($spec->{isa});	    
-    		    # if the constraing it not found ....
-    		    unless (defined $constraint) {
-    		        # assume it is a foreign class, and make 
-    		        # an anon constraint for it 
-    		        $constraint = Moose::Util::TypeConstraints::subtype(
-    		            'Object', 
-    		            Moose::Util::TypeConstraints::where { $_->isa($spec->{isa}) }
-    		        );
-    		    }
-            }
+		    $constraint = Moose::Util::TypeConstraints::find_or_create_type_constraint(
+                $spec->{isa} => {
+                    parent     => Moose::Util::TypeConstraints::find_type_constraint('Object'),
+                    constraint => sub { $_[0]->isa($spec->{isa}) }
+                }
+            );
         }
         
         $pv_spec{callbacks} = {
@@ -102,17 +140,12 @@ sub _convert_to_param_validate_spec {
 			$constraint = $spec->{does};
 		}
 		else {
-		    # otherwise assume it is a constraint
-		    $constraint = Moose::Util::TypeConstraints::find_type_constraint($spec->{does});	      
-		    # if the constraing it not found ....
-		    unless (defined $constraint) {	  		        
-		        # assume it is a foreign class, and make 
-		        # an anon constraint for it 
-		        $constraint = Moose::Util::TypeConstraints::subtype(
-		            'Role', 
-		            Moose::Util::TypeConstraints::where { $_->does($spec->{does}) }
-		        );
-		    }			    
+		    $constraint = Moose::Util::TypeConstraints::find_or_create_type_constraint(
+                $spec->{does} => {
+                    parent     => Moose::Util::TypeConstraints::find_type_constraint('Role'),
+                    constraint => sub { $_[0]->does($spec->{does}) }
+                }
+            );			    
 		}	    
 		
         $pv_spec{callbacks} = {
@@ -151,11 +184,12 @@ MooseX::Params::Validate - an extension of Params::Validate for using Moose's ty
   
   sub bar {
       my $self = shift;
-      my ($foo, $baz) = validatep(\@_, 
-          foo => { isa => 'Foo' },                    
-          baz => { isa => 'ArrayRef | HashRef', optional => 1 }                        
+      my ($foo, $baz, $gorch) = validatep(\@_, 
+          foo   => { isa => 'Foo' },                    
+          baz   => { isa => 'ArrayRef | HashRef', optional => 1 }      
+          gorch => { isa => 'ArrayRef[Int]', optional => 1 }                                  
       );
-      [ $foo, $baz ];
+      [ $foo, $baz, $gorch ];
   }
 
 =head1 DESCRIPTION
@@ -170,10 +204,8 @@ change and get added, so watch out :)
 =head1 CAVEATS
 
 It is not possible to introspect the method parameter specs, they are 
-created as needed when the method is called and tossed aside afterwards.
-
-This is probably not the most efficient way to do this, but it works 
-for what it is. 
+created as needed when the method is called and cached for subsequent 
+calls.
 
 =head1 EXPORTS
 
@@ -232,6 +264,34 @@ not included, then it will be set to C<undef>.
 
 =back
 
+=head1 IMPORTANT NOTE ON CACHING
+
+When C<validate> or C<validatep> are called the first time, the parameter
+spec is prepared and cached to avoid unnecessary regeneration. It uses the
+fully qualified name of the subroutine (package + subname) as the cache key. 
+In 99.999% of the use cases for this module, that will be the right thing 
+to do.
+
+However, I have (ab)used this module occasionally to handle dynamic sets 
+of parameters. In this special use case you can do a couple things to 
+better control the caching behavior. 
+
+=over 4
+
+=item *
+
+Passing in the C<MX_PARAMS_VALIDATE_NO_CACHE> flag in the parameter spec 
+this will prevent the parameter spec from being cached. To see an example 
+of this, take a look at F<t/003_nocache_flag.t>.
+
+=item *
+
+Passing in C<MX_PARAMS_VALIDATE_CACHE_KEY> with a value to be used as the
+cache key will bypass the normal cache key generation. To see an example 
+of this, take a look at F<t/004_custom_cache_key.t>.
+
+=back
+
 =head1 METHODS
 
 =over 4
@@ -260,7 +320,7 @@ Stevan Little E<lt>stevan.little@iinteractive.comE<gt>
 
 =head1 COPYRIGHT AND LICENSE
 
-Copyright 2007 by Infinity Interactive, Inc.
+Copyright 2007-2008 by Infinity Interactive, Inc.
 
 L<http://www.iinteractive.com>
 

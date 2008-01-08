@@ -1,6 +1,6 @@
 ---
 name: MooseX-Params-Validate
-version: 0.03
+version: 0.04
 author:
   - 'Stevan Little E<lt>stevan.little@iinteractive.comE<gt>'
 abstract: an extension of Params::Validate for using Moose's types
@@ -8,7 +8,7 @@ license: perl
 resources:
   license: http://dev.perl.org/licenses/
 requires:
-  Moose: 0.17
+  Moose: 0.33
   Params::Validate: 0.88
 build_requires:
   Test::Exception: 0.21
@@ -16,8 +16,8 @@ build_requires:
 provides:
   MooseX::Params::Validate:
     file: lib/MooseX/Params/Validate.pm
-    version: 0.03
-generated_by: Module::Build version 0.2805
+    version: 0.04
+generated_by: Module::Build version 0.2808
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.2.html
   version: 1.2

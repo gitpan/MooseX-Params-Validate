@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 28;
+use Test::More tests => 34;
 use Test::Exception;
 
 BEGIN {
@@ -36,10 +36,11 @@ BEGIN {
     sub bar {
         my $self   = shift;
         my %params = validate(\@_, 
-            foo => { isa => 'Foo' },                    
-            baz => { isa => 'ArrayRef | HashRef', optional => 1 },                                
+            foo   => { isa => 'Foo' },                    
+            baz   => { isa => 'ArrayRef | HashRef', optional => 1 },  
+            gorch => { isa => 'ArrayRef[Int]', optional => 1 },                                            
         );
-        [ $params{foo}, $params{baz} ];
+        [ $params{foo}, $params{baz}, $params{gorch} ];
     } 
     
     sub baz {
@@ -86,17 +87,17 @@ dies_ok { $foo->bar(baz => [])    } '... bar has a required foo param';
 
 is_deeply(
 $foo->bar(foo => $foo), 
-[$foo, undef], 
+[$foo, undef, undef], 
 '... the foo param in &bar got a Foo instance');
 
 is_deeply(
 $foo->bar(foo => $foo, baz => []), 
-[$foo, []], 
+[$foo, [], undef], 
 '... the foo param and baz param in &bar got a correct args');
 
 is_deeply(
 $foo->bar(foo => $foo, baz => {}), 
-[$foo, {}], 
+[$foo, {}, undef], 
 '... the foo param and baz param in &bar got a correct args');
 
 dies_ok { $foo->bar(foo => $foo, baz => undef)      } '... baz requires a ArrayRef | HashRef';
@@ -104,12 +105,14 @@ dies_ok { $foo->bar(foo => $foo, baz => 10)         } '... baz requires a ArrayR
 dies_ok { $foo->bar(foo => $foo, baz => 'Foo')      } '... baz requires a ArrayRef | HashRef';
 dies_ok { $foo->bar(foo => $foo, baz => \(my $var)) } '... baz requires a ArrayRef | HashRef';
 
+is_deeply(
+$foo->bar(foo => $foo, gorch => [1, 2, 3]), 
+[$foo, undef, [1, 2, 3]], 
+'... the foo param in &bar got a Foo instance');
 
-
-
-
-
-
-
-
+dies_ok { $foo->bar(foo => $foo, gorch => undef)      } '... gorch requires a ArrayRef[Int]';
+dies_ok { $foo->bar(foo => $foo, gorch => 10)         } '... gorch requires a ArrayRef[Int]';
+dies_ok { $foo->bar(foo => $foo, gorch => 'Foo')      } '... gorch requires a ArrayRef[Int]';
+dies_ok { $foo->bar(foo => $foo, gorch => \(my $var)) } '... gorch requires a ArrayRef[Int]';
+dies_ok { $foo->bar(foo => $foo, gorch => [qw/one two three/]) } '... gorch requires a ArrayRef[Int]';
 
