@@ -7,6 +7,8 @@ WriteMakefile
           'PREREQ_PM' => {
                            'Moose' => '0.33',
                            'Params::Validate' => '0.88',
+                           'Sub::Exporter' => '0',
+                           'Sub::Name' => '0',
                            'Test::Exception' => '0.21',
                            'Test::More' => '0.62'
                          },

@@ -5,9 +5,11 @@ use strict;
 my $build = Module::Build->new(
     module_name => 'MooseX::Params::Validate',
     license => 'perl',
-    requires => {   
+    requires => {
         'Moose'            => '0.33',
         'Params::Validate' => '0.88',
+        'Sub::Exporter'    => '0',
+        'Sub::Name'        => '0',
     },
     optional => {
     },

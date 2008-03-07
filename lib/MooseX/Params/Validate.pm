@@ -1,162 +1,240 @@
 package MooseX::Params::Validate;
-use Moose 'blessed', 'confess';
-use Moose::Util::TypeConstraints ();
-use Params::Validate ();
 
-our $VERSION   = '0.04';
+use strict;
+use warnings;
+
+use Carp         'confess';
+use Scalar::Util 'blessed';
+use Sub::Name    'subname';
+
+use Moose::Util::TypeConstraints ();
+use Params::Validate             ();
+use Sub::Exporter                ();
+
+our $VERSION   = '0.05';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_PARAM_SPECS;
 
-sub import {
-    my $class = shift;
-    my $pkg   = caller;
-    
-    return if $pkg eq 'main';
-    
-    return unless $pkg->can('meta')
-               && $pkg->meta->isa('Class::MOP::Class') ||
-                  $pkg->meta->isa('Moose::Meta::Role');
-    
-    $pkg->meta->alias_method('validate' => sub {
-        my ($args, %params) = @_;
-        
-        my $cache_key;
-        if (exists $params{MX_PARAMS_VALIDATE_CACHE_KEY}) {
-            $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-            delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-        }
-        else {
-            $cache_key = (caller(1))[3];
-            ($cache_key =~ /^$pkg/)
-                || confess "You are doing something odd, I expect $cache_key to the the name of this sub";
-        }
-        
-        if (exists $CACHED_PARAM_SPECS{ $cache_key }) {
-            (ref $CACHED_PARAM_SPECS{ $cache_key } eq 'HASH')
-                || confess "I was expecting a HASH-ref in the cached $cache_key parameter" 
-                         . " spec, you are doing something funky, stop it!";
-            %params = %{ $CACHED_PARAM_SPECS{ $cache_key } };
-        }
-        else {
-            my $should_cache = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
-            delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
-            # prepare the parameters ...
-            $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
-                foreach keys %params;
-            $CACHED_PARAM_SPECS{ $cache_key } = \%params 
-                if $should_cache;            
-        }
-            
-        my $instance;
-        $instance = shift @$args if blessed $args->[0];
-        
-        my %args = Params::Validate::validate(@$args, \%params);
-        
-        return (($instance ? $instance : ()), %args);        
-    });
-    
-    $pkg->meta->alias_method('validatep' => sub {
-        my ($args, @params) = @_;
-        
-        my %params = @params;        
-        
-        my $cache_key;
-        if (exists $params{MX_PARAMS_VALIDATE_CACHE_KEY}) {
-            $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-            delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-        }
-        else {
-            $cache_key = (caller(1))[3];
-            ($cache_key =~ /^$pkg/)
-                || confess "You are doing something odd, I expect $cache_key to the the name of this sub";
-        }
-        
-        my @ordered_params;
-        if (exists $CACHED_PARAM_SPECS{ $cache_key }) {
-            (ref $CACHED_PARAM_SPECS{ $cache_key } eq 'ARRAY')
-                || confess "I was expecting a ARRAY-ref in the cached $cache_key parameter" 
-                         . " spec, you are doing something funky, stop it!";            
-            %params         = %{ $CACHED_PARAM_SPECS{ $cache_key }->[0] };
-            @ordered_params = @{ $CACHED_PARAM_SPECS{ $cache_key }->[1] };
-        }
-        else {
-            my $should_cache = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
-            delete $params{MX_PARAMS_VALIDATE_NO_CACHE};            
-            
-            @ordered_params = grep { exists $params{$_} } @params;
+{
+    my $class  = __PACKAGE__;
+    my $CALLER = caller();
 
-            # prepare the parameters ...
-            $params{$_} = $class->_convert_to_param_validate_spec($params{$_})
-                foreach keys %params;
+    my %exports = (
+        'validate' => sub {
+            my $pkg = $CALLER;
 
-            $CACHED_PARAM_SPECS{ $cache_key } = [ \%params, \@ordered_params ] 
-                if $should_cache;            
-        }        
-            
-        my $instance;
-        $instance = shift @$args if blessed $args->[0];
-        
-        my %args = Params::Validate::validate(@$args, \%params);
-        
-        return (($instance ? $instance : ()), @args{@ordered_params});        
-    });    
+            return subname 'MooseX::Params::Validate::validate' => sub {
+                my ( $args, %params ) = @_;
+
+                my $cache_key;
+                if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
+                    $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+                    delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+                }
+                else {
+                    $cache_key = ( caller(1) )[3];
+                    ( $cache_key =~ /^$pkg/ )
+                        || confess
+                        "You are doing something odd, I expect $cache_key to be the the name of this sub";
+                }
+
+                if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
+                    ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'HASH' )
+                        || confess
+                        "I was expecting a HASH-ref in the cached $cache_key parameter"
+                        . " spec, you are doing something funky, stop it!";
+                    %params = %{ $CACHED_PARAM_SPECS{$cache_key} };
+                }
+                else {
+                    my $should_cache
+                        = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+                    delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
+
+                    # prepare the parameters ...
+                    $params{$_}
+                        = $class->_convert_to_param_validate_spec(
+                        $params{$_} )
+                        foreach keys %params;
+                    $CACHED_PARAM_SPECS{$cache_key} = \%params
+                        if $should_cache;
+                }
+
+                my $instance;
+                $instance = shift @$args if blessed $args->[0];
+
+                my %args = @$args;
+
+                $class->_coerce_args( \%args, \%params )
+                    if grep { $params{$_}{coerce} } keys %params;
+
+                %args = Params::Validate::validate_with(
+                    params => \%args,
+                    spec   => \%params
+                );
+
+                return ( ( $instance ? $instance : () ), %args );
+                }
+        },
+        'validatep' => sub {
+            my $pkg = $CALLER;
+
+            return subname 'MooseX::Params::Validate::validatep' => sub {
+                my ( $args, @params ) = @_;
+
+                my %params = @params;
+
+                my $cache_key;
+                if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
+                    $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+                    delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+                }
+                else {
+                    $cache_key = ( caller(1) )[3];
+                    ( $cache_key =~ /^$pkg/ )
+                        || confess
+                        "You are doing something odd, I expect $cache_key to the the name of this sub";
+                }
+
+                my @ordered_params;
+                if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
+                    ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'ARRAY' )
+                        || confess
+                        "I was expecting a ARRAY-ref in the cached $cache_key parameter"
+                        . " spec, you are doing something funky, stop it!";
+                    %params = %{ $CACHED_PARAM_SPECS{$cache_key}->[0] };
+                    @ordered_params
+                        = @{ $CACHED_PARAM_SPECS{$cache_key}->[1] };
+                }
+                else {
+                    my $should_cache
+                        = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+                    delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
+
+                    @ordered_params = grep { exists $params{$_} } @params;
+
+                    # prepare the parameters ...
+                    $params{$_}
+                        = $class->_convert_to_param_validate_spec(
+                        $params{$_} )
+                        foreach keys %params;
+
+                    $CACHED_PARAM_SPECS{$cache_key}
+                        = [ \%params, \@ordered_params ]
+                        if $should_cache;
+                }
+
+                my $instance;
+                $instance = shift @$args if blessed $args->[0];
+
+                my %args = @$args;
+
+                $class->_coerce_args( \%args, \%params )
+                    if grep { $params{$_}{coerce} } keys %params;
+
+                %args = Params::Validate::validate_with( params => \%args,
+                    spec => \%params );
+
+                return ( ( $instance ? $instance : () ),
+                    @args{@ordered_params} );
+                }
+        },
+    );
+
+    my $exporter = Sub::Exporter::build_exporter(
+        {
+            exports => \%exports,
+            groups  => { default => [':all'] }
+        }
+    );
+
+    sub import {
+        my $class = shift;
+
+        $CALLER = caller();
+
+        goto $exporter;
+    }
 }
 
 sub _convert_to_param_validate_spec {
-    my ($self, $spec) = @_;
+    my ( $self, $spec ) = @_;
     my %pv_spec;
-    
+
     $pv_spec{optional} = $spec->{optional}
         if exists $spec->{optional};
-        
+
     $pv_spec{default} = $spec->{default}
         if exists $spec->{default};
-    
-    if (exists $spec->{isa}) {
+
+    $pv_spec{coerce} = $spec->{coerce}
+        if exists $spec->{coerce};
+
+    if ( exists $spec->{isa} ) {
         my $constraint;
-        
-        if (blessed($spec->{isa}) && $spec->{isa}->isa('Moose::Meta::TypeConstraint')) {
-			$constraint = $spec->{isa};
-		}
-        else {
-		    $constraint = Moose::Util::TypeConstraints::find_or_create_type_constraint(
-                $spec->{isa} => {
-                    parent     => Moose::Util::TypeConstraints::find_type_constraint('Object'),
-                    constraint => sub { $_[0]->isa($spec->{isa}) }
-                }
-            );
+
+        if ( blessed( $spec->{isa} )
+            && $spec->{isa}->isa('Moose::Meta::TypeConstraint') ) {
+            $constraint = $spec->{isa};
         }
-        
+        else {
+            $constraint
+                = Moose::Util::TypeConstraints::find_or_create_type_constraint
+                (
+                $spec->{isa} => {
+                    parent =>
+                        Moose::Util::TypeConstraints::find_type_constraint(
+                        'Object'),
+                    constraint => sub { $_[0]->isa( $spec->{isa} ) }
+                }
+                );
+        }
+
+        $pv_spec{constraint} = $constraint;
+
         $pv_spec{callbacks} = {
-            'checking type constraint' => sub { $constraint->check($_[0]) }
+            'checking type constraint' => sub { $constraint->check( $_[0] ) }
         };
     }
-    elsif (exists $spec->{does}) {
-        
-        my $constraint;	    
+    elsif ( exists $spec->{does} ) {
 
-	    if (blessed($spec->{does}) && $spec->{does}->isa('Moose::Meta::TypeConstraint')) {
-			$constraint = $spec->{does};
-		}
-		else {
-		    $constraint = Moose::Util::TypeConstraints::find_or_create_type_constraint(
+        my $constraint;
+
+        if ( blessed( $spec->{does} )
+            && $spec->{does}->isa('Moose::Meta::TypeConstraint') ) {
+            $constraint = $spec->{does};
+        }
+        else {
+            $constraint
+                = Moose::Util::TypeConstraints::find_or_create_type_constraint
+                (
                 $spec->{does} => {
-                    parent     => Moose::Util::TypeConstraints::find_type_constraint('Role'),
-                    constraint => sub { $_[0]->does($spec->{does}) }
+                    parent =>
+                        Moose::Util::TypeConstraints::find_type_constraint(
+                        'Role'),
+                    constraint => sub { $_[0]->does( $spec->{does} ) }
                 }
-            );			    
-		}	    
-		
+                );
+        }
+
         $pv_spec{callbacks} = {
-            'checking type constraint' => sub { $constraint->check($_[0]) }
-        };	
-	}
-	
-	# TODO:
-	# add coercion here
-    
+            'checking type constraint' => sub { $constraint->check( $_[0] ) }
+        };
+    }
+
+    delete $pv_spec{coerce}
+        unless $pv_spec{constraint} && $pv_spec{constraint}->has_coercion;
+
     return \%pv_spec;
+}
+
+sub _coerce_args {
+    my ( $class, $args, $params ) = @_;
+
+    for my $k ( grep { $params->{$_}{coerce} } keys %{ $params } ) {
+        $args->{$k} = $params->{$k}{constraint}->coerce( $args->{$k} );
+    }
+
 }
 
 1;
@@ -239,6 +317,12 @@ This is the default value to be used if the value is not supplied.
 
 As with Params::Validate, all options are considered required unless otherwise 
 specified. This option is passed directly to Params::Validate.
+
+=item I<coerce>
+
+If this is true and the parameter has a type constraint which has
+coercions, then the coercion will be called for this parameter. If the
+type does have coercions, then this parameter is ignored.
 
 =back
 

@@ -1,5 +1,11 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.05 Fri. Mar. 7th, 2008
+    - This package would cause a fatal error if loaded
+      by a non-Moose class (Dave Rolsky)
+      - added tests for this (Dave Rolsky)
+    - Added support for coercions (Dave Rolsky)
+
 0.04 Tues. Jan. 8th, 2008
     - upped the Moose dependency and added support
       for the new improved Moose type constraints

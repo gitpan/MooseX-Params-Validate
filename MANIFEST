@@ -1,15 +1,16 @@
 Build.PL
 ChangeLog
-META.yml
-Makefile.PL
-MANIFEST
-MANIFEST.SKIP
-README
 lib/MooseX/Params/Validate.pm
+MANIFEST			This list of files
+README
 t/000_load.t
 t/001_basic.t
 t/002_basic_positional.t
 t/003_nocache_flag.t
 t/004_custom_cache_key.t
+t/005_coercion.t
+t/006_not_moose.t
 t/pod.t
 t/pod_coverage.t
+Makefile.PL
+META.yml
