@@ -1,5 +1,9 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.06 Sat. Sep. 20, 2008
+    - Fixes to work with Moose 0.58 (Dave Rolsky)
+    - Switched to using Module::Install (Dave Rolsky)
+
 0.05 Fri. Mar. 7th, 2008
     - This package would cause a fatal error if loaded
       by a non-Moose class (Dave Rolsky)

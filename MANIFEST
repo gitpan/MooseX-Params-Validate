@@ -1,7 +1,16 @@
-Build.PL
 ChangeLog
+inc/Module/Install.pm
+inc/Module/Install/Base.pm
+inc/Module/Install/Can.pm
+inc/Module/Install/Fetch.pm
+inc/Module/Install/Makefile.pm
+inc/Module/Install/Metadata.pm
+inc/Module/Install/Win32.pm
+inc/Module/Install/WriteAll.pm
 lib/MooseX/Params/Validate.pm
+Makefile.PL
 MANIFEST			This list of files
+META.yml
 README
 t/000_load.t
 t/001_basic.t
@@ -12,5 +21,3 @@ t/005_coercion.t
 t/006_not_moose.t
 t/pod.t
 t/pod_coverage.t
-Makefile.PL
-META.yml

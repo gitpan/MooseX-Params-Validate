@@ -7,154 +7,121 @@ use Carp         'confess';
 use Scalar::Util 'blessed';
 use Sub::Name    'subname';
 
+use Moose::Exporter;
 use Moose::Util::TypeConstraints ();
 use Params::Validate             ();
-use Sub::Exporter                ();
 
-our $VERSION   = '0.05';
+our $VERSION   = '0.06';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_PARAM_SPECS;
 
-{
-    my $class  = __PACKAGE__;
-    my $CALLER = caller();
 
-    my %exports = (
-        'validate' => sub {
-            my $pkg = $CALLER;
+Moose::Exporter->setup_import_methods( as_is => [qw( validate validatep )] );
 
-            return subname 'MooseX::Params::Validate::validate' => sub {
-                my ( $args, %params ) = @_;
+my $class = __PACKAGE__;
+sub validate {
+    my ( $args, %params ) = @_;
 
-                my $cache_key;
-                if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
-                    $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-                    delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-                }
-                else {
-                    $cache_key = ( caller(1) )[3];
-                    ( $cache_key =~ /^$pkg/ )
-                        || confess
-                        "You are doing something odd, I expect $cache_key to be the the name of this sub";
-                }
-
-                if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
-                    ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'HASH' )
-                        || confess
-                        "I was expecting a HASH-ref in the cached $cache_key parameter"
-                        . " spec, you are doing something funky, stop it!";
-                    %params = %{ $CACHED_PARAM_SPECS{$cache_key} };
-                }
-                else {
-                    my $should_cache
-                        = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
-                    delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
-
-                    # prepare the parameters ...
-                    $params{$_}
-                        = $class->_convert_to_param_validate_spec(
-                        $params{$_} )
-                        foreach keys %params;
-                    $CACHED_PARAM_SPECS{$cache_key} = \%params
-                        if $should_cache;
-                }
-
-                my $instance;
-                $instance = shift @$args if blessed $args->[0];
-
-                my %args = @$args;
-
-                $class->_coerce_args( \%args, \%params )
-                    if grep { $params{$_}{coerce} } keys %params;
-
-                %args = Params::Validate::validate_with(
-                    params => \%args,
-                    spec   => \%params
-                );
-
-                return ( ( $instance ? $instance : () ), %args );
-                }
-        },
-        'validatep' => sub {
-            my $pkg = $CALLER;
-
-            return subname 'MooseX::Params::Validate::validatep' => sub {
-                my ( $args, @params ) = @_;
-
-                my %params = @params;
-
-                my $cache_key;
-                if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
-                    $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-                    delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
-                }
-                else {
-                    $cache_key = ( caller(1) )[3];
-                    ( $cache_key =~ /^$pkg/ )
-                        || confess
-                        "You are doing something odd, I expect $cache_key to the the name of this sub";
-                }
-
-                my @ordered_params;
-                if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
-                    ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'ARRAY' )
-                        || confess
-                        "I was expecting a ARRAY-ref in the cached $cache_key parameter"
-                        . " spec, you are doing something funky, stop it!";
-                    %params = %{ $CACHED_PARAM_SPECS{$cache_key}->[0] };
-                    @ordered_params
-                        = @{ $CACHED_PARAM_SPECS{$cache_key}->[1] };
-                }
-                else {
-                    my $should_cache
-                        = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
-                    delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
-
-                    @ordered_params = grep { exists $params{$_} } @params;
-
-                    # prepare the parameters ...
-                    $params{$_}
-                        = $class->_convert_to_param_validate_spec(
-                        $params{$_} )
-                        foreach keys %params;
-
-                    $CACHED_PARAM_SPECS{$cache_key}
-                        = [ \%params, \@ordered_params ]
-                        if $should_cache;
-                }
-
-                my $instance;
-                $instance = shift @$args if blessed $args->[0];
-
-                my %args = @$args;
-
-                $class->_coerce_args( \%args, \%params )
-                    if grep { $params{$_}{coerce} } keys %params;
-
-                %args = Params::Validate::validate_with( params => \%args,
-                    spec => \%params );
-
-                return ( ( $instance ? $instance : () ),
-                    @args{@ordered_params} );
-                }
-        },
-    );
-
-    my $exporter = Sub::Exporter::build_exporter(
-        {
-            exports => \%exports,
-            groups  => { default => [':all'] }
-        }
-    );
-
-    sub import {
-        my $class = shift;
-
-        $CALLER = caller();
-
-        goto $exporter;
+    my $cache_key;
+    if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
+        $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+        delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
     }
+    else {
+        $cache_key = ( caller(1) )[3];
+    }
+
+    if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
+        ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'HASH' )
+            || confess
+            "I was expecting a HASH-ref in the cached $cache_key parameter"
+            . " spec, you are doing something funky, stop it!";
+        %params = %{ $CACHED_PARAM_SPECS{$cache_key} };
+    }
+    else {
+        my $should_cache
+            = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+        delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
+
+        # prepare the parameters ...
+        $params{$_} = $class->_convert_to_param_validate_spec( $params{$_} )
+            foreach keys %params;
+        $CACHED_PARAM_SPECS{$cache_key} = \%params
+            if $should_cache;
+    }
+
+    my $instance;
+    $instance = shift @$args if blessed $args->[0];
+
+    my %args = @$args;
+
+    $class->_coerce_args( \%args, \%params )
+        if grep { $params{$_}{coerce} } keys %params;
+
+    %args = Params::Validate::validate_with(
+        params => \%args,
+        spec   => \%params
+    );
+
+    return ( ( $instance ? $instance : () ), %args );
+}
+
+sub validatep {
+    my ( $args, @params ) = @_;
+
+    my %params = @params;
+
+    my $cache_key;
+    if ( exists $params{MX_PARAMS_VALIDATE_CACHE_KEY} ) {
+        $cache_key = $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+        delete $params{MX_PARAMS_VALIDATE_CACHE_KEY};
+    }
+    else {
+        $cache_key = ( caller(1) )[3];
+    }
+
+    my @ordered_params;
+    if ( exists $CACHED_PARAM_SPECS{$cache_key} ) {
+        ( ref $CACHED_PARAM_SPECS{$cache_key} eq 'ARRAY' )
+            || confess
+            "I was expecting a ARRAY-ref in the cached $cache_key parameter"
+            . " spec, you are doing something funky, stop it!";
+        %params         = %{ $CACHED_PARAM_SPECS{$cache_key}->[0] };
+        @ordered_params = @{ $CACHED_PARAM_SPECS{$cache_key}->[1] };
+    }
+    else {
+        my $should_cache
+            = exists $params{MX_PARAMS_VALIDATE_NO_CACHE} ? 0 : 1;
+        delete $params{MX_PARAMS_VALIDATE_NO_CACHE};
+
+        @ordered_params = grep { exists $params{$_} } @params;
+
+        # prepare the parameters ...
+        $params{$_} = $class->_convert_to_param_validate_spec( $params{$_} )
+            foreach keys %params;
+
+        $CACHED_PARAM_SPECS{$cache_key} = [ \%params, \@ordered_params ]
+            if $should_cache;
+    }
+
+    my $instance;
+    $instance = shift @$args if blessed $args->[0];
+
+    my %args = @$args;
+
+    $class->_coerce_args( \%args, \%params )
+        if grep { $params{$_}{coerce} } keys %params;
+
+    %args = Params::Validate::validate_with(
+        params => \%args,
+        spec   => \%params
+    );
+
+    return (
+        ( $instance ? $instance : () ),
+        @args{@ordered_params}
+    );
 }
 
 sub _convert_to_param_validate_spec {

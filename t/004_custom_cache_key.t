@@ -3,13 +3,9 @@
 use strict;
 use warnings;
 
-use Test::More tests => 8;
+use Test::More tests => 7;
 use Test::Exception;
 use Scalar::Util;
-
-BEGIN {
-    use_ok('MooseX::Params::Validate');
-}
 
 {
     package Foo;
