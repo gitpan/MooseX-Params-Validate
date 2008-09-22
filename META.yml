@@ -17,8 +17,10 @@ no_index:
     - inc
     - t
 requires:
+  Carp: 0
   Moose: 0.58
   Params::Validate: 0.88
+  Scalar::Util: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.06
+version: 0.07

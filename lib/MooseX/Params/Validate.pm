@@ -5,13 +5,12 @@ use warnings;
 
 use Carp         'confess';
 use Scalar::Util 'blessed';
-use Sub::Name    'subname';
 
 use Moose::Exporter;
 use Moose::Util::TypeConstraints ();
 use Params::Validate             ();
 
-our $VERSION   = '0.06';
+our $VERSION   = '0.07';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_PARAM_SPECS;
