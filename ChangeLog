@@ -1,16 +1,30 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.08
+    - Renamed validate to validated_hash and validatep to
+      validated_list. The old function names are still available under
+      the ":deprecated" import tag.
+
+    - Added a new pos_validated_list which can validate position
+      parameters.
+
+    - Errors now reflect the subroutine that called the validation
+      function, rather than coming form inside the validation function
+      itself.
+	
 0.07 Sun. Sep. 21, 2008
     - No code changes, just fixing missing prereqs (Dave Rolsky)
 
 0.06 Sat. Sep. 20, 2008
     - Fixes to work with Moose 0.58 (Dave Rolsky)
+
     - Switched to using Module::Install (Dave Rolsky)
 
 0.05 Fri. Mar. 7th, 2008
     - This package would cause a fatal error if loaded
       by a non-Moose class (Dave Rolsky)
       - added tests for this (Dave Rolsky)
+
     - Added support for coercions (Dave Rolsky)
 
 0.04 Tues. Jan. 8th, 2008

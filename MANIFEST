@@ -14,10 +14,12 @@ META.yml
 README
 t/000_load.t
 t/001_basic.t
-t/002_basic_positional.t
+t/002_basic_list.t
 t/003_nocache_flag.t
 t/004_custom_cache_key.t
 t/005_coercion.t
 t/006_not_moose.t
+t/007_deprecated.t
+t/008_positional.t
 t/pod.t
 t/pod_coverage.t

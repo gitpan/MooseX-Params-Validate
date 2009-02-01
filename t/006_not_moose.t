@@ -13,6 +13,8 @@ eval <<'EOF';
 }
 EOF
 
-is( $@, '',
-    'loading MX::Params::Validate in a non-Moose class does not blow up' );
-ok( Foo->can('validate'), 'validate() sub was added to Foo package' );
+is(
+    $@, '',
+    'loading MX::Params::Validate in a non-Moose class does not blow up'
+);
+ok( Foo->can('validated_hash'), 'validated_hash() sub was added to Foo package' );

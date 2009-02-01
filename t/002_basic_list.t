@@ -3,24 +3,16 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 27;
 use Test::Exception;
 
 {
     package Roles::Blah;
     use Moose::Role;
-    use MooseX::Params::Validate;
 
+    requires 'foo';
     requires 'bar';
     requires 'baz';
-
-    sub foo {
-        my ( $self, %params ) = validated_hash(
-            \@_,
-            bar => { isa => 'Str', default => 'Moose' },
-        );
-        return "Horray for $params{bar}!";
-    }
 
     package Foo;
     use Moose;
@@ -29,20 +21,27 @@ use Test::Exception;
 
     with 'Roles::Blah';
 
-    sub bar {
-        my $self   = shift;
-        my %params = validated_hash(
+    sub foo {
+        my ( $self, $bar ) = validated_list(
             \@_,
-            foo   => { isa => 'Foo' },
-            baz   => { isa => 'ArrayRef | HashRef', optional => 1 },
-            gorch => { isa => 'ArrayRef[Int]', optional => 1 },
+            bar => { isa => 'Str', default => 'Moose' },
         );
-        [ $params{foo}, $params{baz}, $params{gorch} ];
+        return "Horray for $bar!";
+    }
+
+    sub bar {
+        my $self = shift;
+        my ( $foo, $baz ) = validated_list(
+            \@_,
+            foo => { isa => 'Foo' },
+            baz => { isa => 'ArrayRef | HashRef', optional => 1 },
+        );
+        [ $foo, $baz ];
     }
 
     sub baz {
-        my $self   = shift;
-        my %params = validated_hash(
+        my $self = shift;
+        my ( $foo, $bar, $boo ) = validated_list(
             \@_,
             foo => {
                 isa => subtype( 'Object' => where { $_->isa('Foo') } ),
@@ -55,7 +54,7 @@ use Test::Exception;
                 optional => 1
             },
         );
-        return $params{foo} || $params{bar} || $params{boo};
+        return $foo || $bar || $boo;
     }
 }
 
@@ -106,19 +105,19 @@ throws_ok { $foo->bar( baz => [] ) } qr/\QMandatory parameter 'foo'/,,
 
 is_deeply(
     $foo->bar( foo => $foo ),
-    [ $foo, undef, undef ],
+    [ $foo, undef ],
     '... the foo param in &bar got a Foo instance'
 );
 
 is_deeply(
     $foo->bar( foo => $foo, baz => [] ),
-    [ $foo, [], undef ],
+    [ $foo, [] ],
     '... the foo param and baz param in &bar got a correct args'
 );
 
 is_deeply(
     $foo->bar( foo => $foo, baz => {} ),
-    [ $foo, {}, undef ],
+    [ $foo, {} ],
     '... the foo param and baz param in &bar got a correct args'
 );
 
@@ -134,26 +133,3 @@ qr/\QThe 'baz' parameter ("Foo")/,
 throws_ok { $foo->bar( foo => $foo, baz => \( my $var ) ) }
 qr/\QThe 'baz' parameter/,
     '... baz requires a ArrayRef | HashRef';
-
-is_deeply(
-    $foo->bar( foo => $foo, gorch => [ 1, 2, 3 ] ),
-    [ $foo, undef, [ 1, 2, 3 ] ],
-    '... the foo param in &bar got a Foo instance'
-);
-
-throws_ok { $foo->bar( foo => $foo, gorch => undef ) }
-qr/\QThe 'gorch' parameter (undef)/,
-    '... gorch requires a ArrayRef[Int]';
-throws_ok { $foo->bar( foo => $foo, gorch => 10 ) }
-qr/\QThe 'gorch' parameter ("10")/,
-    '... gorch requires a ArrayRef[Int]';
-throws_ok { $foo->bar( foo => $foo, gorch => 'Foo' ) }
-qr/\QThe 'gorch' parameter ("Foo")/,
-    '... gorch requires a ArrayRef[Int]';
-throws_ok { $foo->bar( foo => $foo, gorch => \( my $var ) ) }
-qr/\QThe 'gorch' parameter/,
-    '... gorch requires a ArrayRef[Int]';
-throws_ok { $foo->bar( foo => $foo, gorch => [qw/one two three/] ) }
-qr/\QThe 'gorch' parameter/,
-    '... gorch requires a ArrayRef[Int]';
-
