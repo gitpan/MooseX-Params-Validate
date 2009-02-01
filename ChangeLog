@@ -1,6 +1,10 @@
 Revision history for Perl extension MooseX-Params-Validate
 
-0.08
+0.09 Sun. Feb. 1, 2009
+     - The subroutine name being reported in error messages was
+       screwy.
+
+0.08 Sun. Feb. 1, 2009
     - Renamed validate to validated_hash and validatep to
       validated_list. The old function names are still available under
       the ":deprecated" import tag.

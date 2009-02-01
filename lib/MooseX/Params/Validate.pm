@@ -18,7 +18,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.08';
+our $VERSION   = '0.09';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;
@@ -231,7 +231,7 @@ sub _convert_to_param_validate_spec {
 sub _caller_name {
     my $depth = shift || 0;
 
-    return join '::', ( caller( 2 + $depth ) )[0, 3];
+    return ( caller( 2 + $depth ) )[3];
 }
 
 1;
