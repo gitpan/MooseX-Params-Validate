@@ -1,12 +1,15 @@
 ---
-abstract: 'an extension of Params::Validate for using Moose''s types'
+abstract: "an extension of Params::Validate for using Moose's types"
 author:
   - 'Stevan Little <stevan.little@iinteractive.com>'
 build_requires:
+  ExtUtils::MakeMaker: 6.42
   Test::Exception: 0.21
   Test::More: 0.62
+configure_requires:
+  ExtUtils::MakeMaker: 6.42
 distribution_type: module
-generated_by: 'Module::Install version 0.77'
+generated_by: 'Module::Install version 0.91'
 license: Perl
 meta-spec:
   url: http://module-build.sourceforge.net/META-spec-v1.4.html
@@ -24,4 +27,4 @@ requires:
   Sub::Exporter: 0
 resources:
   license: http://dev.perl.org/licenses/
-version: 0.09
+version: 0.10

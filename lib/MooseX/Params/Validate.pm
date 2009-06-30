@@ -18,7 +18,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.09';
+our $VERSION   = '0.10';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;

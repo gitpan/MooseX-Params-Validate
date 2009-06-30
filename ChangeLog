@@ -1,8 +1,11 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.10 Tue. Jun. 30, 2009
+    - Shut up deprecation warnings from the tests. Reported by John
+      Goulah.
+
 0.09 Sun. Feb. 1, 2009
-     - The subroutine name being reported in error messages was
-       screwy.
+    - The subroutine name being reported in error messages was screwy.
 
 0.08 Sun. Feb. 1, 2009
     - Renamed validate to validated_hash and validatep to

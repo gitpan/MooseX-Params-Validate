@@ -49,8 +49,7 @@ use Test::Exception;
             },
             bar => { does => 'Roles::Blah', optional => 1 },
             boo => {
-                does =>
-                    subtype( 'Role' => where { $_->does('Roles::Blah') } ),
+                does     => role_type('Roles::Blah'),
                 optional => 1
             },
         );
