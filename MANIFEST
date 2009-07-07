@@ -21,5 +21,6 @@ t/005_coercion.t
 t/006_not_moose.t
 t/007_deprecated.t
 t/008_positional.t
+t/009_wrapped.t
 t/pod.t
 t/pod_coverage.t

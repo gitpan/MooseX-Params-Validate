@@ -7,6 +7,7 @@ all_from 'lib/MooseX/Params/Validate.pm';
 
 
 requires 'Carp'             => '0';
+requires 'Devel::Caller'    => '0';
 requires 'Moose'            => '0.58';
 requires 'Params::Validate' => '0.88';
 requires 'Scalar::Util'     => '0';

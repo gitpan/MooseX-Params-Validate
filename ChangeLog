@@ -1,14 +1,21 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.12 Tue. Jul. 7, 2009
+    - Using the subroutine name as a cache key for validation specs
+      broke in the face of method modifiers, which all appear to have
+      the same name. Now we use Devel::Caller to get the CV of the
+      caller and use its refaddr as the key, which will be unique in
+      all cases. Bug report by Jos Boumans. RT #46730.
+
 0.11 Tue. Jul. 7, 2009
     - The validation functions tried to coerce optional keys which
       weren't present in the incoming parameters, leading to weird
-      errors. RT #46344. (Jos Boumans)
+      errors. Based on a patch from Jos Boumans. RT #46344. 
 
     - Allow other callbacks to be specified. Previously these were
       silently thrown out. But we'd recommend just defining types that
-      encapsulate everything in the callback instead. RT #47647. (Jos
-      Boumans).
+      encapsulate everything in the callback instead. Based on a patch
+      from Jos Boumans. RT #47647.
 	
 0.10 Tue. Jun. 30, 2009
     - Shut up deprecation warnings from the tests. Reported by John

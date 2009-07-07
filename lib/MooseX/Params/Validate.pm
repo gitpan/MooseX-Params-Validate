@@ -4,7 +4,8 @@ use strict;
 use warnings;
 
 use Carp 'confess';
-use Scalar::Util 'blessed';
+use Devel::Caller 'caller_cv';
+use Scalar::Util 'blessed', 'refaddr';
 
 use Moose::Util::TypeConstraints qw( find_type_constraint class_type role_type );
 use Params::Validate             ();
@@ -18,7 +19,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.11';
+our $VERSION   = '0.12';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;
@@ -163,7 +164,7 @@ sub _cache_key {
         return delete $spec->{MX_PARAMS_VALIDATE_CACHE_KEY};
     }
     else {
-        return _caller_name(1);
+        return refaddr( caller_cv(2) );
     }
 }
 
