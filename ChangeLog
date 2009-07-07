@@ -1,5 +1,15 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.11 Tue. Jul. 7, 2009
+    - The validation functions tried to coerce optional keys which
+      weren't present in the incoming parameters, leading to weird
+      errors. RT #46344. (Jos Boumans)
+
+    - Allow other callbacks to be specified. Previously these were
+      silently thrown out. But we'd recommend just defining types that
+      encapsulate everything in the callback instead. RT #47647. (Jos
+      Boumans).
+	
 0.10 Tue. Jun. 30, 2009
     - Shut up deprecation warnings from the tests. Reported by John
       Goulah.

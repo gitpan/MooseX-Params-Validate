@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 9;
+use Test::More tests => 10;
 use Test::Exception;
 
 {
@@ -34,6 +34,18 @@ use Test::Exception;
             size1  => { isa => 'Size', coerce => 1 },
             size2  => { isa => 'Size', coerce => 0 },
             number => { isa => 'Num',  coerce => 1 },
+        );
+        [ $size1, $size2, $number ];
+    }
+
+
+    sub quux {
+        my $self = shift;
+        my ( $size1, $size2, $number ) = validated_list(
+            \@_,
+            size1  => { isa => 'Size', coerce => 1, optional => 1 },
+            size2  => { isa => 'Size', coerce => 0, optional => 1 },
+            number => { isa => 'Num',  coerce => 1, optional => 1 },
         );
         [ $size1, $size2, $number ];
     }
@@ -81,3 +93,9 @@ qr/\QThe 'size2' parameter/,
 throws_ok { $foo->baz( size1 => 30, size2 => 10, number => 'something' ) }
 qr/\QThe 'number' parameter/,
     '... the number param cannot be coerced';
+
+is_deeply(
+    $foo->quux( size2 => 4 ),
+    [ undef, 4, undef ],
+    '... does not try to coerce keys which are not provided'
+);

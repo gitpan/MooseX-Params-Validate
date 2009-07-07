@@ -18,7 +18,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.10';
+our $VERSION   = '0.11';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;
@@ -98,7 +98,7 @@ sub validated_list {
     my %args = @$args;
 
     $args{$_} = $spec{$_}{constraint}->coerce( $args{$_} )
-        for grep { $spec{$_}{coerce} } keys %spec;
+        for grep { $spec{$_}{coerce} && exists $args{$_} } keys %spec;
 
     %args = Params::Validate::validate_with(
         params => \%args,
@@ -180,52 +180,45 @@ sub _convert_to_param_validate_spec {
     $pv_spec{coerce} = $spec->{coerce}
         if exists $spec->{coerce};
 
-    if ( exists $spec->{isa} ) {
-        my $constraint;
-
-        if ( blessed( $spec->{isa} )
-            && $spec->{isa}->isa('Moose::Meta::TypeConstraint') ) {
-            $constraint = $spec->{isa};
-        }
-        else {
-            $constraint
-                = Moose::Util::TypeConstraints::find_or_parse_type_constraint(
-                $spec->{isa} )
-                || class_type( $spec->{isa} );
-        }
-
-        $pv_spec{constraint} = $constraint;
-
-        $pv_spec{callbacks} = {
-            'checking type constraint for '
-                . $constraint->name => sub { $constraint->check( $_[0] ) }
-        };
+    my $constraint;
+    if ( defined $spec->{isa} ) {
+        $constraint
+             = _is_tc( $spec->{isa} )
+            || Moose::Util::TypeConstraints::find_or_parse_type_constraint(
+            $spec->{isa} )
+            || class_type( $spec->{isa} );
     }
-    elsif ( exists $spec->{does} ) {
+    elsif ( defined $spec->{does} ) {
+        $constraint
+            = _is_tc( $spec->{isa} )
+            || find_type_constraint( $spec->{does} )
+            || role_type( $spec->{does} );
+    }
 
-        my $constraint;
+    $pv_spec{callbacks} = $spec->{callbacks}
+        if exists $spec->{callbacks};
 
-        if ( blessed( $spec->{does} )
-            && $spec->{does}->isa('Moose::Meta::TypeConstraint') ) {
-            $constraint = $spec->{does};
-        }
-        else {
-            $constraint = find_type_constraint( $spec->{does} )
-                || role_type( $spec->{does} );
-        }
-
+    if ($constraint) {
         $pv_spec{constraint} = $constraint;
 
-        $pv_spec{callbacks} = {
-            'checking type constraint for '
-                . $constraint->name => sub { $constraint->check( $_[0] ) }
-        };
+        $pv_spec{callbacks}
+            { 'checking type constraint for ' . $constraint->name }
+            = sub { $constraint->check( $_[0] ) };
     }
 
     delete $pv_spec{coerce}
         unless $pv_spec{constraint} && $pv_spec{constraint}->has_coercion;
 
     return \%pv_spec;
+}
+
+sub _is_tc {
+    my $maybe_tc = shift;
+
+    return $maybe_tc
+        if defined $maybe_tc
+            && blessed $maybe_tc
+            && $maybe_tc->isa('Moose::Meta::TypeConstraint');
 }
 
 sub _caller_name {

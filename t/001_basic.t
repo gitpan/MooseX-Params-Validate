@@ -3,7 +3,7 @@
 use strict;
 use warnings;
 
-use Test::More tests => 33;
+use Test::More tests => 35;
 use Test::Exception;
 
 {
@@ -55,6 +55,21 @@ use Test::Exception;
             },
         );
         return $params{foo} || $params{bar} || $params{boo};
+    }
+
+    sub quux {
+        my $self   = shift;
+        my %params = validated_hash(
+            \@_,
+            foo => {
+                isa       => 'ArrayRef',
+                callbacks => {
+                    'some random callback' => sub { @{ $_[0] } <= 2 },
+                },
+            },
+        );
+
+        return $params{foo};
     }
 }
 
@@ -156,3 +171,10 @@ throws_ok { $foo->bar( foo => $foo, gorch => [qw/one two three/] ) }
 qr/\QThe 'gorch' parameter/,
     '... gorch requires a ArrayRef[Int]';
 
+throws_ok { $foo->quux( foo => '123456790' ) }
+qr/\QThe 'foo' parameter\E.+\Qchecking type constraint/,
+'... foo parameter must be an ArrayRef';
+
+throws_ok { $foo->quux( foo => [ 1, 2, 3, 4 ] ) }
+qr/\QThe 'foo' parameter\E.+\Qsome random callback/,
+'... foo parameter additional callback requires that arrayref be 0-2 elements';
