@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use inc::Module::Install;
+use inc::Module::Install 0.91;
 
 name 'MooseX-Params-Validate';
 all_from 'lib/MooseX/Params/Validate.pm';
@@ -17,5 +17,7 @@ build_requires 'Test::More'      => '0.62';
 build_requires 'Test::Exception' => '0.21';
 
 license 'Perl';
+
+resources repository => 'http://code2.0beta.co.uk/moose/svn/MooseX-Params-Validate';
 
 WriteAll();

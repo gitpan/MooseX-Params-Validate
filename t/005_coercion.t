@@ -3,9 +3,11 @@
 use strict;
 use warnings;
 
-use Test::More tests => 10;
+use Test::More tests => 15;
 use Test::Exception;
 
+# Note that setting coerce => 1 for the Num type tests that we don't try to do
+# coercions for a type which doesn't have any coercions.
 {
     package Foo;
     use Moose;
@@ -27,6 +29,19 @@ use Test::Exception;
         [ $params{size1}, $params{size2}, $params{number} ];
     }
 
+    # added to test 'optional' on validated_hash
+    sub baropt {
+        my $self = shift;
+        my %params = validated_hash(
+            \@_,
+            size1  => { isa => 'Size', coerce => 1, optional => 1 },
+            size2  => { isa => 'Size', coerce => 0, optional => 1 },
+            number => { isa => 'Num',  coerce => 1, optional => 1 },
+        );
+        [ $params{size1}, $params{size2}, $params{number} ];
+    }
+
+
     sub baz {
         my $self = shift;
         my ( $size1, $size2, $number ) = validated_list(
@@ -46,6 +61,17 @@ use Test::Exception;
             size1  => { isa => 'Size', coerce => 1, optional => 1 },
             size2  => { isa => 'Size', coerce => 0, optional => 1 },
             number => { isa => 'Num',  coerce => 1, optional => 1 },
+        );
+        [ $size1, $size2, $number ];
+    }
+
+    sub ran_out {
+        my $self = shift;
+        my ( $size1, $size2, $number ) = pos_validated_list(
+            \@_,
+            { isa => 'Size', coerce => 1, optional => 1 },
+            { isa => 'Size', coerce => 0, optional => 1 },
+            { isa => 'Num',  coerce => 1, optional => 1 },
         );
         [ $size1, $size2, $number ];
     }
@@ -72,7 +98,7 @@ qr/\QThe 'size2' parameter/,
 
 throws_ok { $foo->bar( size1 => 30, size2 => 10, number => 'something' ) }
 qr/\QThe 'number' parameter/,
-    '... the number param cannot be coerced';
+    '... the number param cannot be coerced because there is no coercion defined for Num';
 
 is_deeply(
     $foo->baz( size1 => 10, size2 => 20, number => 30 ),
@@ -95,7 +121,36 @@ qr/\QThe 'number' parameter/,
     '... the number param cannot be coerced';
 
 is_deeply(
+    $foo->baropt( size2 => 4 ),
+    [ undef, 4, undef ],
+    '... validated_hash does not try to coerce keys which are not provided'
+);
+
+is_deeply(
     $foo->quux( size2 => 4 ),
     [ undef, 4, undef ],
-    '... does not try to coerce keys which are not provided'
+    '... validated_list does not try to coerce keys which are not provided'
+);
+
+is_deeply(
+    $foo->ran_out( 1, 2, 3 ),
+    [ 1, 2, 3 ],
+    'got the return value right without coercions'
+);
+
+is_deeply(
+    $foo->ran_out( [1], 2, 3 ),
+    [ 1, 2, 3 ],
+    'got the return value right with coercion for the first param'
+);
+
+throws_ok { $foo->ran_out( [ 1, 2 ], [ 1, 2 ] ) }
+qr/\QParameter #2/,
+    '... did not attempt to coerce the second parameter';
+
+
+is_deeply(
+    $foo->ran_out(),
+    [ undef, undef, undef ],
+    'did not try to coerce non-existent parameters'
 );

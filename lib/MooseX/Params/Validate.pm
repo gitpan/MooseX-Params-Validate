@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.12';
+our $VERSION   = '0.13';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;
@@ -52,7 +52,7 @@ sub validated_hash {
     my %args = @$args;
 
     $args{$_} = $spec{$_}{constraint}->coerce( $args{$_} )
-        for grep { $spec{$_}{coerce} } keys %spec;
+        for grep { $spec{$_}{coerce} && exists $args{$_} } keys %spec;
 
     %args = Params::Validate::validate_with(
         params => \%args,
@@ -146,7 +146,7 @@ sub pos_validated_list {
     my @args = @{$args};
 
     $args[$_] = $pv_spec[$_]{constraint}->coerce( $args[$_] )
-        for grep { $pv_spec[$_]{coerce} } 0 .. $#pv_spec;
+        for grep { $pv_spec[$_] && $pv_spec[$_]{coerce} } 0 .. $#args;
 
     @args = Params::Validate::validate_with(
         params => \@args,

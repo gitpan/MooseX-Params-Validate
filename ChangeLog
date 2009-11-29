@@ -1,5 +1,11 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.13 Sun., Nov. 29, 2009
+    - Fix so that validated_hash does not try to coerce optional
+      parameters which are not present. Patch by Ian Sillitoe.
+
+    - Same fix for pos_validated_list. (Dave Rolsky)
+
 0.12 Tue. Jul. 7, 2009
     - Using the subroutine name as a cache key for validation specs
       broke in the face of method modifiers, which all appear to have
