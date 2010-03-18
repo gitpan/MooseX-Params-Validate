@@ -22,5 +22,8 @@ t/006_not_moose.t
 t/007_deprecated.t
 t/008_positional.t
 t/009_wrapped.t
-t/pod.t
-t/pod_coverage.t
+t/010.overloaded.t
+xt/kwalitee.t
+xt/pod-coverage.t
+xt/pod-spell.t
+xt/pod.t

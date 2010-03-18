@@ -19,7 +19,7 @@ use Sub::Exporter -setup => {
     },
 };
 
-our $VERSION   = '0.13';
+our $VERSION   = '0.14';
 our $AUTHORITY = 'cpan:STEVAN';
 
 my %CACHED_SPECS;
@@ -60,7 +60,7 @@ sub validated_hash {
         called => _caller_name(),
     );
 
-    return ( ( $instance ? $instance : () ), %args );
+    return ( ( defined $instance ? $instance : () ), %args );
 }
 
 *validate = \&validated_hash;
@@ -108,7 +108,7 @@ sub validated_list {
     );
 
     return (
-        ( $instance ? $instance : () ),
+        ( defined $instance ? $instance : () ),
         @args{@ordered_spec}
     );
 }

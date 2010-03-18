@@ -1,6 +1,11 @@
 Revision history for Perl extension MooseX-Params-Validate
 
-0.13 Sun., Nov. 29, 2009
+0.14 Sun. Mar. 18, 2010
+    - The validated_hash method failed when called on in an overloaded
+      stringify method. Patch by Ian Sillitoe. RT #52565.
+
+
+0.13 Sun. Nov. 29, 2009
     - Fix so that validated_hash does not try to coerce optional
       parameters which are not present. Patch by Ian Sillitoe.
 

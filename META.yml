@@ -19,6 +19,7 @@ no_index:
   directory:
     - inc
     - t
+    - xt
 requires:
   Carp: 0
   Devel::Caller: 0
@@ -29,4 +30,4 @@ requires:
 resources:
   license: http://dev.perl.org/licenses/
   repository: http://code2.0beta.co.uk/moose/svn/MooseX-Params-Validate
-version: 0.13
+version: 0.14
