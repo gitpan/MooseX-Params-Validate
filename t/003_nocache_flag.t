@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 4;
-use Test::Exception;
+use Test::More;
+use Test::Fatal;
 
 {
     package Foo;
@@ -21,18 +21,28 @@ use Test::Exception;
 my $foo = Foo->new;
 isa_ok( $foo, 'Foo' );
 
-lives_ok {
-    $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
-}
-'... successfully applied the parameter validation';
+is(
+    exception {
+        $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
+    },
+    undef,
+    '... successfully applied the parameter validation'
+);
 
-lives_ok {
-    $foo->bar( [ baz => [ 1, 2, 3 ] ], { baz => { isa => 'ArrayRef' } } );
-}
-'... successfully applied the parameter validation (look mah no cache)';
+is(
+    exception {
+        $foo->bar( [ baz => [ 1, 2, 3 ] ], { baz => { isa => 'ArrayRef' } } );
+    },
+    undef,
+    '... successfully applied the parameter validation (look mah no cache)'
+);
 
-lives_ok {
-    $foo->bar( [ baz => { one => 1 } ], { baz => { isa => 'HashRef' } } );
-}
-'... successfully applied the parameter validation (look mah no cache) (just checkin)';
+is(
+    exception {
+        $foo->bar( [ baz => { one => 1 } ], { baz => { isa => 'HashRef' } } );
+    },
+    undef,
+    '... successfully applied the parameter validation (look mah no cache) (just checkin)'
+);
 
+done_testing();

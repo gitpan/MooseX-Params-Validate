@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 15;
-use Test::Exception;
+use Test::More;
+use Test::Fatal;
 
 # Note that setting coerce => 1 for the Num type tests that we don't try to do
 # coercions for a type which doesn't have any coercions.
@@ -31,7 +31,7 @@ use Test::Exception;
 
     # added to test 'optional' on validated_hash
     sub baropt {
-        my $self = shift;
+        my $self   = shift;
         my %params = validated_hash(
             \@_,
             size1  => { isa => 'Size', coerce => 1, optional => 1 },
@@ -40,7 +40,6 @@ use Test::Exception;
         );
         [ $params{size1}, $params{size2}, $params{number} ];
     }
-
 
     sub baz {
         my $self = shift;
@@ -52,7 +51,6 @@ use Test::Exception;
         );
         [ $size1, $size2, $number ];
     }
-
 
     sub quux {
         my $self = shift;
@@ -92,13 +90,15 @@ is_deeply(
     'got the return value right with coercions for size1'
 );
 
-throws_ok { $foo->bar( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
-qr/\QThe 'size2' parameter/,
-    '... the size2 param cannot be coerced';
+like(
+    exception { $foo->bar( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
+    , qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced' );
 
-throws_ok { $foo->bar( size1 => 30, size2 => 10, number => 'something' ) }
-qr/\QThe 'number' parameter/,
-    '... the number param cannot be coerced because there is no coercion defined for Num';
+like(
+    exception { $foo->bar( size1 => 30, size2 => 10, number => 'something' ) }
+    , qr/\QThe 'number' parameter/,
+    '... the number param cannot be coerced because there is no coercion defined for Num'
+);
 
 is_deeply(
     $foo->baz( size1 => 10, size2 => 20, number => 30 ),
@@ -112,13 +112,15 @@ is_deeply(
     'got the return value right with coercions for size1'
 );
 
-throws_ok { $foo->baz( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
-qr/\QThe 'size2' parameter/,
-    '... the size2 param cannot be coerced';
+like(
+    exception { $foo->baz( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
+    , qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced' );
 
-throws_ok { $foo->baz( size1 => 30, size2 => 10, number => 'something' ) }
-qr/\QThe 'number' parameter/,
-    '... the number param cannot be coerced';
+like(
+    exception { $foo->baz( size1 => 30, size2 => 10, number => 'something' ) }
+    , qr/\QThe 'number' parameter/,
+    '... the number param cannot be coerced'
+);
 
 is_deeply(
     $foo->baropt( size2 => 4 ),
@@ -144,13 +146,15 @@ is_deeply(
     'got the return value right with coercion for the first param'
 );
 
-throws_ok { $foo->ran_out( [ 1, 2 ], [ 1, 2 ] ) }
-qr/\QParameter #2/,
-    '... did not attempt to coerce the second parameter';
-
+like(
+    exception { $foo->ran_out( [ 1, 2 ], [ 1, 2 ] ) }, qr/\QParameter #2/,
+    '... did not attempt to coerce the second parameter'
+);
 
 is_deeply(
     $foo->ran_out(),
     [ undef, undef, undef ],
     'did not try to coerce non-existent parameters'
 );
+
+done_testing();

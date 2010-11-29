@@ -1,0 +1,50 @@
+This file contains message digests of all files listed in MANIFEST,
+signed via the Module::Signature module, version 0.61.
+
+To verify the content in this distribution, first make sure you have
+Module::Signature installed, then type:
+
+    % cpansign -v
+
+It will check each file's integrity, as well as the signature's
+validity.  If "==> Signature verified OK! <==" is not displayed,
+the distribution may already have been compromised, and you should
+not run its Makefile.PL or Build.PL.
+
+-----BEGIN PGP SIGNED MESSAGE-----
+Hash: SHA1
+
+SHA1 817f3de5af1b184b7fc03e50dcb535c7fa2510c7 ChangeLog
+SHA1 cc4d2fab66c18673004f62a31d4d5e0336bbfe8a INSTALL
+SHA1 c2e7f481b3423397eee994d1272293bdd956d261 LICENSE
+SHA1 288714ab3375009ab4f947b15411d4cef2437d28 MANIFEST
+SHA1 67a1c067dedcae42c9520eac5bf6805e4f6b5b6d META.json
+SHA1 c9a9209e6caa86aaf270d60e8134607e5438f378 META.yml
+SHA1 1a9e5c8ed8b142a5002dbbe5374796dfb63e4ead Makefile.PL
+SHA1 8c9fce17e16b4c9c0da8f73792e2ad95e7bd1755 README
+SHA1 915673a4ab4960ab9c2dfda83c808d96022b4912 dist.ini
+SHA1 ddc5e51be198964d648fbe661e2f5d882a3d5bf9 lib/MooseX/Params/Validate.pm
+SHA1 26d791d014ba8912b754a21d94a53c120ffab187 t/000_load.t
+SHA1 9ae33440d43635ab30fdbed609aad4b3ff830420 t/001_basic.t
+SHA1 cda4c07346a1fb86d55c51fb498b66ba5ce2cc1c t/002_basic_list.t
+SHA1 a5cc6e8070743463d6af57685eb8d27f00f69993 t/003_nocache_flag.t
+SHA1 027d9855cefa7097ac998067da9b3c3ea9cd0844 t/004_custom_cache_key.t
+SHA1 39c271010d7d5c00e21d1c7e00b990ee1f3135ff t/005_coercion.t
+SHA1 6d56e5bbaa66a57d12be1b31581675c40a71115f t/006_not_moose.t
+SHA1 38afb967c7f58dd4a54763244647623be10bf07b t/007_deprecated.t
+SHA1 8d7690661e1b9eb5dc7ceef9c16dd4db601dfc18 t/008_positional.t
+SHA1 76bc8865bfd1fd344994252aea881fee194a1cbb t/009_wrapped.t
+SHA1 ae17b92bd2f8a376d7ab5a830110394d59e5adb1 t/010_overloaded.t
+SHA1 5eba65d7bd97ce02725da6e5a90c8b261ff80a89 t/011_allow_extra.t
+SHA1 a032c41ef6887fab1b900669c2d304fab46680e2 t/release-eol.t
+SHA1 455d1dd1867212a665ad5ea4126b572411de300c t/release-no-tabs.t
+SHA1 287ab1af698d8e0e25b88242dd22162da726cd74 t/release-pod-coverage.t
+SHA1 b9b79a13a0d702407ea729f5f4e41bae3e882c58 t/release-pod-spell.t
+SHA1 b30cbdfaf935017c4568c0c91b242438cb87786e t/release-pod-syntax.t
+-----BEGIN PGP SIGNATURE-----
+Version: GnuPG v1.4.10 (GNU/Linux)
+
+iEYEARECAAYFAkz0LVwACgkQIgMCsV8qvRIIUACeIY6SNldw+GowwK2ROgKEjv5m
+oyoAnjlmE6AbQbjCXC/4iHiPKG2jhEjO
+=Do5v
+-----END PGP SIGNATURE-----

@@ -1,30 +1,13 @@
-MooseX::Params::Validate version 0.13
-===========================
 
-See the individual module documentation for more information
 
-INSTALLATION
+This archive contains the distribution MooseX-Params-Validate,
+version 0.15:
 
-To install this module type the following:
+  an extension of Params::Validate using Moose's types
 
-   perl Makefile.PL
-   make
-   make test
-   make install
+This software is copyright (c) 2010 by Stevan Little <stevan.little@iinteractive.com>.
 
-DEPENDENCIES
+This is free software; you can redistribute it and/or modify it under
+the same terms as the Perl 5 programming language system itself.
 
-This module requires these other modules and libraries:
-
-    Moose
-    Params::Validate
-
-COPYRIGHT AND LICENCE
-
-Copyright (C) 2007-2008 Infinity Interactive, Inc.
-
-http://www.iinteractive.com
-
-This library is free software; you can redistribute it and/or modify
-it under the same terms as Perl itself. 
 

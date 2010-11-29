@@ -1,5 +1,10 @@
 Revision history for Perl extension MooseX-Params-Validate
 
+0.15
+    - Add MX_PARAMS_VALIDATE_ALLOW_EXTRA which allows extra parameters in
+      validation calls (like allow_extra for Params::Validate).
+    - Converted to Test::Fatal.
+
 0.14 Sun. Mar. 18, 2010
     - The validated_hash method failed when called on in an overloaded
       stringify method. Patch by Ian Sillitoe. RT #52565.
@@ -21,13 +26,13 @@ Revision history for Perl extension MooseX-Params-Validate
 0.11 Tue. Jul. 7, 2009
     - The validation functions tried to coerce optional keys which
       weren't present in the incoming parameters, leading to weird
-      errors. Based on a patch from Jos Boumans. RT #46344. 
+      errors. Based on a patch from Jos Boumans. RT #46344.
 
     - Allow other callbacks to be specified. Previously these were
       silently thrown out. But we'd recommend just defining types that
       encapsulate everything in the callback instead. Based on a patch
       from Jos Boumans. RT #47647.
-	
+
 0.10 Tue. Jun. 30, 2009
     - Shut up deprecation warnings from the tests. Reported by John
       Goulah.
@@ -46,7 +51,7 @@ Revision history for Perl extension MooseX-Params-Validate
     - Errors now reflect the subroutine that called the validation
       function, rather than coming form inside the validation function
       itself.
-	
+
 0.07 Sun. Sep. 21, 2008
     - No code changes, just fixing missing prereqs (Dave Rolsky)
 
@@ -66,18 +71,18 @@ Revision history for Perl extension MooseX-Params-Validate
     - upped the Moose dependency and added support
       for the new improved Moose type constraints
       - added tests for this
-    
-    - adding caching of the prepared parameter 
-      specs, this results in approx. 3x speedup 
-      using rough benchmarks. 
-      
-    - added special caching handlers see the 
-      IMPORTANT NOTE ON CACHING section of the 
+
+    - adding caching of the prepared parameter
+      specs, this results in approx. 3x speedup
+      using rough benchmarks.
+
+    - added special caching handlers see the
+      IMPORTANT NOTE ON CACHING section of the
       POD for more details
       - added tests for this
 
 0.03 Fri. June 8th, 2007
-    - added support for using this 
+    - added support for using this
       within role methods too.
 
 0.02 Wed. April 25, 2007

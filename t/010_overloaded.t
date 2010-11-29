@@ -1,4 +1,4 @@
-use Test::More tests => 4;
+use Test::More;
 use strict;
 use warnings;
 
@@ -30,8 +30,10 @@ use warnings;
         # 1.10.100 => 0001.0010.0100
         my $id
             = $args{padded}
-            ? join( '.',
-            map { sprintf( "%04d", $_ ) } split( /\./, $self->id ) )
+            ? join(
+            '.',
+            map { sprintf( "%04d", $_ ) } split( /\./, $self->id )
+            )
             : $self->id;
 
         return $id;
@@ -49,3 +51,4 @@ is(
     'to_string( padded => 1 )'
 );
 
+done_testing();

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 31;
-use Test::Exception;
+use Test::More;
+use Test::Fatal;
 
 {
     package Roles::Blah;
@@ -45,8 +45,7 @@ use Test::Exception;
         my $self = shift;
         return [
             pos_validated_list(
-                \@_,
-                {
+                \@_, {
                     isa => subtype( 'Object' => where { $_->isa('Foo') } ),
                     optional => 1
                 },
@@ -65,43 +64,76 @@ isa_ok( $foo, 'Foo' );
 
 is( $foo->baz($foo)->[0], $foo, '... first param must be a Foo instance' );
 
-throws_ok { $foo->baz(10) } qr/\QParameter #1 ("10")/,
-    '... the first param in &baz must be a Foo instance';
-throws_ok { $foo->baz('foo') } qr/\QParameter #1 ("foo")/,
-    '... the first param in &baz must be a Foo instance';
-throws_ok { $foo->baz( [] ) } qr/\QParameter #1/,
-    '... the first param in &baz must be a Foo instance';
+like(
+    exception { $foo->baz(10) }, qr/\QParameter #1 ("10")/,
+    '... the first param in &baz must be a Foo instance'
+);
+like(
+    exception { $foo->baz('foo') }, qr/\QParameter #1 ("foo")/,
+    '... the first param in &baz must be a Foo instance'
+);
+like(
+    exception { $foo->baz( [] ) }, qr/\QParameter #1/,
+    '... the first param in &baz must be a Foo instance'
+);
 
-is( $foo->baz( $foo, $foo )->[1], $foo,
-    '... second param must do Roles::Blah' );
+is(
+    $foo->baz( $foo, $foo )->[1], $foo,
+    '... second param must do Roles::Blah'
+);
 
-throws_ok { $foo->baz( $foo, 10 ) } qr/\QParameter #2 ("10")/,
-    '... the second param in &baz must be do Roles::Blah';
-throws_ok { $foo->baz( $foo, 'foo' ) } qr/\QParameter #2 ("foo")/,
-    '... the second param in &baz must be do Roles::Blah';
-throws_ok { $foo->baz( $foo, [] ) } qr/\QParameter #2/,
-    '... the second param in &baz must be do Roles::Blah';
+like(
+    exception { $foo->baz( $foo, 10 ) }, qr/\QParameter #2 ("10")/,
+    '... the second param in &baz must be do Roles::Blah'
+);
+like(
+    exception { $foo->baz( $foo, 'foo' ) }, qr/\QParameter #2 ("foo")/,
+    '... the second param in &baz must be do Roles::Blah'
+);
+like(
+    exception { $foo->baz( $foo, [] ) }, qr/\QParameter #2/,
+    '... the second param in &baz must be do Roles::Blah'
+);
 
-is( $foo->baz( $foo, $foo, $foo )->[2], $foo,
-    '... third param must do Roles::Blah' );
+is(
+    $foo->baz( $foo, $foo, $foo )->[2], $foo,
+    '... third param must do Roles::Blah'
+);
 
-throws_ok { $foo->baz( $foo, $foo, 10 ) } qr/\QParameter #3 ("10")/,
-    '... the third param in &baz must be do Roles::Blah';
-throws_ok { $foo->baz( $foo, $foo, "foo" ) } qr/\QParameter #3 ("foo")/,
-    '... the third param in &baz must be do Roles::Blah';
-throws_ok { $foo->baz( $foo, $foo, [] ) } qr/\QParameter #3/,
-    '... the third param in &baz must be do Roles::Blah';
+like(
+    exception { $foo->baz( $foo, $foo, 10 ) }, qr/\QParameter #3 ("10")/,
+    '... the third param in &baz must be do Roles::Blah'
+);
+like(
+    exception { $foo->baz( $foo, $foo, "foo" ) },
+    qr/\QParameter #3 ("foo")/,
+    '... the third param in &baz must be do Roles::Blah'
+);
+like(
+    exception { $foo->baz( $foo, $foo, [] ) }, qr/\QParameter #3/,
+    '... the third param in &baz must be do Roles::Blah'
+);
 
-throws_ok { $foo->bar } qr/\Q0 parameters were passed/,
-    '... bar has a required params';
-throws_ok { $foo->bar(10) } qr/\QParameter #1 ("10")/,
-    '... the first param in &bar must be a Foo instance';
-throws_ok { $foo->bar('foo') } qr/\QParameter #1 ("foo")/,
-    '... the first param in &bar must be a Foo instance';
-throws_ok { $foo->bar( [] ) } qr/\QParameter #1/,
-    '... the first param in &bar must be a Foo instance';
-throws_ok { $foo->bar() } qr/\Q0 parameters were passed/,
-    '... bar has a required first param';
+like(
+    exception { $foo->bar }, qr/\Q0 parameters were passed/,
+    '... bar has a required params'
+);
+like(
+    exception { $foo->bar(10) }, qr/\QParameter #1 ("10")/,
+    '... the first param in &bar must be a Foo instance'
+);
+like(
+    exception { $foo->bar('foo') }, qr/\QParameter #1 ("foo")/,
+    '... the first param in &bar must be a Foo instance'
+);
+like(
+    exception { $foo->bar( [] ) }, qr/\QParameter #1/,
+    '... the first param in &bar must be a Foo instance'
+);
+like(
+    exception { $foo->bar() }, qr/\Q0 parameters were passed/,
+    '... bar has a required first param'
+);
 
 is_deeply(
     $foo->bar($foo),
@@ -121,14 +153,22 @@ is_deeply(
     '... the first param and baz param in &bar got correct args'
 );
 
-throws_ok { $foo->bar( $foo, undef ) } qr/\QParameter #2 (undef)/,
-    '... second param requires a ArrayRef | HashRef';
-throws_ok { $foo->bar( $foo, 10 ) } qr/\QParameter #2 ("10")/,
-    '... second param requires a ArrayRef | HashRef';
-throws_ok { $foo->bar( $foo, 'Foo' ) } qr/\QParameter #2 ("Foo")/,
-    '... second param requires a ArrayRef | HashRef';
-throws_ok { $foo->bar( $foo, \( my $var ) ) } qr/\QParameter #2/,
-    '... second param requires a ArrayRef | HashRef';
+like(
+    exception { $foo->bar( $foo, undef ) }, qr/\QParameter #2 (undef)/,
+    '... second param requires a ArrayRef | HashRef'
+);
+like(
+    exception { $foo->bar( $foo, 10 ) }, qr/\QParameter #2 ("10")/,
+    '... second param requires a ArrayRef | HashRef'
+);
+like(
+    exception { $foo->bar( $foo, 'Foo' ) }, qr/\QParameter #2 ("Foo")/,
+    '... second param requires a ArrayRef | HashRef'
+);
+like(
+    exception { $foo->bar( $foo, \( my $var ) ) }, qr/\QParameter #2/,
+    '... second param requires a ArrayRef | HashRef'
+);
 
 is_deeply(
     $foo->bar( $foo, {}, [ 1, 2, 3 ] ),
@@ -136,14 +176,25 @@ is_deeply(
     '... the first param in &bar got a Foo instance'
 );
 
-throws_ok { $foo->bar( $foo, {}, undef ) } qr/\QParameter #3 (undef)/,
-'... third param a ArrayRef[Int]';
-throws_ok { $foo->bar( $foo, {},  10 ) } qr/\QParameter #3 ("10")/,
-'... third param a ArrayRef[Int]';
-throws_ok { $foo->bar( $foo, {},  'Foo' ) } qr/\QParameter #3 ("Foo")/,
-'... third param a ArrayRef[Int]';
-throws_ok { $foo->bar( $foo, {},  \( my $var ) ) } qr/\QParameter #3/,
-'... third param a ArrayRef[Int]';
-throws_ok { $foo->bar( $foo, {},  [qw/one two three/] ) } qr/\QParameter #3/,
-'... third param a ArrayRef[Int]';
+like(
+    exception { $foo->bar( $foo, {}, undef ) }, qr/\QParameter #3 (undef)/,
+    '... third param a ArrayRef[Int]'
+);
+like(
+    exception { $foo->bar( $foo, {}, 10 ) }, qr/\QParameter #3 ("10")/,
+    '... third param a ArrayRef[Int]'
+);
+like(
+    exception { $foo->bar( $foo, {}, 'Foo' ) }, qr/\QParameter #3 ("Foo")/,
+    '... third param a ArrayRef[Int]'
+);
+like(
+    exception { $foo->bar( $foo, {}, \( my $var ) ) }, qr/\QParameter #3/,
+    '... third param a ArrayRef[Int]'
+);
+like(
+    exception { $foo->bar( $foo, {}, [qw/one two three/] ) },
+    qr/\QParameter #3/, '... third param a ArrayRef[Int]'
+);
 
+done_testing();

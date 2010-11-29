@@ -1,23 +1,59 @@
+
 use strict;
 use warnings;
-use inc::Module::Install 0.91;
-
-name 'MooseX-Params-Validate';
-all_from 'lib/MooseX/Params/Validate.pm';
 
 
-requires 'Carp'             => '0';
-requires 'Devel::Caller'    => '0';
-requires 'Moose'            => '0.58';
-requires 'Params::Validate' => '0.88';
-requires 'Scalar::Util'     => '0';
-requires 'Sub::Exporter'    => '0';
 
-build_requires 'Test::More'      => '0.62';
-build_requires 'Test::Exception' => '0.21';
+use ExtUtils::MakeMaker 6.31;
 
-license 'Perl';
 
-resources repository => 'http://code2.0beta.co.uk/moose/svn/MooseX-Params-Validate';
 
-WriteAll();
+my %WriteMakefileArgs = (
+  'ABSTRACT' => 'an extension of Params::Validate using Moose\'s types',
+  'AUTHOR' => 'Stevan Little <stevan.little@iinteractive.com>',
+  'BUILD_REQUIRES' => {
+    'Test::Fatal' => '0.001',
+    'Test::More' => '0.88'
+  },
+  'CONFIGURE_REQUIRES' => {
+    'ExtUtils::MakeMaker' => '6.31'
+  },
+  'DISTNAME' => 'MooseX-Params-Validate',
+  'EXE_FILES' => [],
+  'LICENSE' => 'perl',
+  'NAME' => 'MooseX::Params::Validate',
+  'PREREQ_PM' => {
+    'Carp' => '0',
+    'Devel::Caller' => '0',
+    'Moose' => '0.58',
+    'Params::Validate' => '0.88',
+    'Scalar::Util' => '0',
+    'Sub::Exporter' => '0'
+  },
+  'VERSION' => '0.15',
+  'test' => {
+    'TESTS' => 't/*.t'
+  }
+);
+
+
+unless ( eval { ExtUtils::MakeMaker->VERSION(6.56) } ) {
+  my $br = delete $WriteMakefileArgs{BUILD_REQUIRES};
+  my $pp = $WriteMakefileArgs{PREREQ_PM};
+  for my $mod ( keys %$br ) {
+    if ( exists $pp->{$mod} ) {
+      $pp->{$mod} = $br->{$mod} if $br->{$mod} > $pp->{$mod};
+    }
+    else {
+      $pp->{$mod} = $br->{$mod};
+    }
+  }
+}
+
+delete $WriteMakefileArgs{CONFIGURE_REQUIRES}
+  unless eval { ExtUtils::MakeMaker->VERSION(6.52) };
+
+WriteMakefile(%WriteMakefileArgs);
+
+
+

@@ -3,8 +3,8 @@
 use strict;
 use warnings;
 
-use Test::More tests => 7;
-use Test::Exception;
+use Test::More;
+use Test::Fatal;
 use Scalar::Util;
 
 {
@@ -23,31 +23,50 @@ use Scalar::Util;
 my $foo = Foo->new;
 isa_ok( $foo, 'Foo' );
 
-lives_ok {
-    $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
-}
-'... successfully applied the parameter validation';
+is(
+    exception {
+        $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
+    },
+    undef,
+    '... successfully applied the parameter validation'
+);
 
-throws_ok {
-    $foo->bar( [ baz => [ 1, 2, 3 ] ], { baz => { isa => 'ArrayRef' } } );
-} qr/\QThe 'baz' parameter/,
-'... successfully re-used the parameter validation for this instance';
+like(
+    exception {
+        $foo->bar( [ baz => [ 1, 2, 3 ] ], { baz => { isa => 'ArrayRef' } } );
+    },
+    qr/\QThe 'baz' parameter/,
+    '... successfully re-used the parameter validation for this instance'
+);
 
 my $foo2 = Foo->new;
 isa_ok( $foo2, 'Foo' );
 
-lives_ok {
-    $foo2->bar( [ baz => [ 1, 2, 3 ] ], { baz => { isa => 'ArrayRef' } } );
-}
-'... successfully applied the parameter validation';
+is(
+    exception {
+        $foo2->bar(
+            [ baz => [ 1, 2, 3 ] ],
+            { baz => { isa => 'ArrayRef' } }
+        );
+    },
+    undef,
+    '... successfully applied the parameter validation'
+);
 
-throws_ok {
-    $foo2->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
-} qr/\QThe 'baz' parameter/,
-'... successfully re-used the parameter validation for this instance';
+like(
+    exception {
+        $foo2->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
+    },
+    qr/\QThe 'baz' parameter/,
+    '... successfully re-used the parameter validation for this instance'
+);
 
-lives_ok {
-    $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
-}
-'... successfully applied the parameter validation (just checking)';
+is(
+    exception {
+        $foo->bar( [ baz => 1 ], { baz => { isa => 'Int' } } );
+    },
+    undef,
+    '... successfully applied the parameter validation (just checking)'
+);
 
+done_testing();
