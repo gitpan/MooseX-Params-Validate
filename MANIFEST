@@ -21,6 +21,7 @@ t/008_positional.t
 t/009_wrapped.t
 t/010_overloaded.t
 t/011_allow_extra.t
+t/012_ref_as_first_param.t
 t/release-eol.t
 t/release-no-tabs.t
 t/release-pod-coverage.t

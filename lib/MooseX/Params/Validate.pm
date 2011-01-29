@@ -1,6 +1,6 @@
 package MooseX::Params::Validate;
 BEGIN {
-  $MooseX::Params::Validate::VERSION = '0.15';
+  $MooseX::Params::Validate::VERSION = '0.16';
 }
 BEGIN {
   $MooseX::Params::Validate::AUTHORITY = 'cpan:STEVAN';
@@ -11,7 +11,7 @@ use warnings;
 
 use Carp 'confess';
 use Devel::Caller 'caller_cv';
-use Scalar::Util 'blessed', 'refaddr';
+use Scalar::Util 'blessed', 'refaddr', 'reftype';
 
 use Moose::Util::TypeConstraints qw( find_type_constraint class_type role_type );
 use Params::Validate             ();
@@ -54,7 +54,10 @@ sub validated_hash {
     my $instance;
     $instance = shift @$args if blessed $args->[0];
 
-    my %args = @$args;
+    my %args
+        = @$args == 1
+        && ref $args->[0]
+        && reftype( $args->[0] ) eq 'HASH' ? %{ $args->[0] } : @$args;
 
     $args{$_} = $spec{$_}{constraint}->coerce( $args{$_} )
         for grep { $spec{$_}{coerce} && exists $args{$_} } keys %spec;
@@ -104,7 +107,10 @@ sub validated_list {
     my $instance;
     $instance = shift @$args if blessed $args->[0];
 
-    my %args = @$args;
+    my %args
+        = @$args == 1
+        && ref $args->[0]
+        && reftype( $args->[0] ) eq 'HASH' ? %{ $args->[0] } : @$args;
 
     $args{$_} = $spec{$_}{constraint}->coerce( $args{$_} )
         for grep { $spec{$_}{coerce} && exists $args{$_} } keys %spec;
@@ -154,7 +160,7 @@ sub pos_validated_list {
             if $should_cache;
     }
 
-    my @args = @{$args};
+    my @args = @$args;
 
     $args[$_] = $pv_spec[$_]{constraint}->coerce( $args[$_] )
         for grep { $pv_spec[$_] && $pv_spec[$_]{coerce} } 0 .. $#args;
@@ -254,7 +260,7 @@ MooseX::Params::Validate - an extension of Params::Validate using Moose's types
 
 =head1 VERSION
 
-version 0.15
+version 0.16
 
 =head1 SYNOPSIS
 
@@ -307,6 +313,9 @@ function and returns the captured values in a HASH. The one exception
 is where if it spots an instance in the C<@_>, then it will handle
 it appropriately (unlike Params::Validate which forces you to shift
 you C<$self> first).
+
+The values in C<@_> can either be a set of name-value pairs or a single hash
+reference.
 
 The C<%parameter_spec> accepts the following options:
 
@@ -361,6 +370,9 @@ We capture the order in which you defined the parameters and then
 return them as a list in the same order. If a param is marked optional
 and not included, then it will be set to C<undef>.
 
+The values in C<@_> can either be a set of name-value pairs or a single hash
+reference.
+
 Like C<validated_hash>, if it spots an object instance as the first
 parameter of C<@_>, it will handle it appropriately, returning it as
 the first argument.
@@ -386,6 +398,10 @@ should validate one of the parameters in the list:
 Unlike the other functions, this function I<cannot> find C<$self> in
 the argument list. Make sure to shift it off yourself before doing
 validation.
+
+The values in C<@_> must be a list of values. You cannot pass the values as an
+array reference, because this cannot be distinguished from passing one value
+which is itself an array reference.
 
 If a parameter is marked as optional and is not present, it will
 simply not be returned.
@@ -487,7 +503,7 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2010 by Stevan Little <stevan.little@iinteractive.com>.
+This software is copyright (c) 2011 by Stevan Little <stevan.little@iinteractive.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.

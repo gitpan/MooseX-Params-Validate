@@ -4,7 +4,7 @@
       "Stevan Little <stevan.little@iinteractive.com>"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Dist::Zilla version 4.102345, CPAN::Meta::Converter version 2.101670",
+   "generated_by" : "Dist::Zilla version 4.200001, CPAN::Meta::Converter version 2.102400",
    "license" : [
       "perl_5"
    ],
@@ -48,6 +48,7 @@
          "web" : "http://git.shadowcat.co.uk/gitweb/gitweb.cgi?p=gitmo/MooseX-Params-Validate.git"
       }
    },
-   "version" : "0.15"
+   "version" : "0.16",
+   "x_authority" : "cpan:STEVAN"
 }
 
