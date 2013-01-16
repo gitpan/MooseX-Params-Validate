@@ -1,6 +1,6 @@
 package MooseX::Params::Validate;
-BEGIN {
-  $MooseX::Params::Validate::VERSION = '0.16';
+{
+  $MooseX::Params::Validate::VERSION = '0.17';
 }
 BEGIN {
   $MooseX::Params::Validate::AUTHORITY = 'cpan:STEVAN';
@@ -250,7 +250,7 @@ sub _caller_name {
 
 # ABSTRACT: an extension of Params::Validate using Moose's types
 
-
+__END__
 
 =pod
 
@@ -260,7 +260,7 @@ MooseX::Params::Validate - an extension of Params::Validate using Moose's types
 
 =head1 VERSION
 
-version 0.16
+version 0.17
 
 =head1 SYNOPSIS
 
@@ -503,13 +503,9 @@ Stevan Little <stevan.little@iinteractive.com>
 
 =head1 COPYRIGHT AND LICENSE
 
-This software is copyright (c) 2011 by Stevan Little <stevan.little@iinteractive.com>.
+This software is copyright (c) 2013 by Stevan Little <stevan.little@iinteractive.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
 
 =cut
-
-
-__END__
-

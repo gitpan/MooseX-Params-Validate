@@ -1,4 +1,6 @@
-Revision history for Perl extension MooseX-Params-Validate
+{{$NEXT}}
+    - Fix tests that broke with new hash randomization in 5.17.6. (Dagfinn
+      Ilmari Mannsåker)
 
 0.16 2011-01-29
     - The validated_list and validated_hash functions now accept the values to

@@ -64,7 +64,8 @@ use Test::Fatal;
             foo => {
                 isa       => 'ArrayRef',
                 callbacks => {
-                    'some random callback' => sub { @{ $_[0] } <= 2 },
+                    'some random callback' =>
+                        sub { !ref( $_[0] ) || @{ $_[0] } <= 2 },
                 },
             },
         );

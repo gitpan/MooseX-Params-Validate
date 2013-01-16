@@ -4,35 +4,41 @@ use warnings;
 
 
 
-use ExtUtils::MakeMaker 6.31;
+use ExtUtils::MakeMaker 6.30;
 
 
 
 my %WriteMakefileArgs = (
-  'ABSTRACT' => 'an extension of Params::Validate using Moose\'s types',
-  'AUTHOR' => 'Stevan Little <stevan.little@iinteractive.com>',
-  'BUILD_REQUIRES' => {
-    'Test::Fatal' => '0.001',
-    'Test::More' => '0.88'
+  "ABSTRACT" => "an extension of Params::Validate using Moose's types",
+  "AUTHOR" => "Stevan Little <stevan.little\@iinteractive.com>",
+  "BUILD_REQUIRES" => {
+    "Moose" => 0,
+    "Moose::Role" => 0,
+    "Roles::Blah" => 0,
+    "Test::Fatal" => 0,
+    "Test::More" => 0,
+    "overload" => 0
   },
-  'CONFIGURE_REQUIRES' => {
-    'ExtUtils::MakeMaker' => '6.31'
+  "CONFIGURE_REQUIRES" => {
+    "ExtUtils::MakeMaker" => "6.30"
   },
-  'DISTNAME' => 'MooseX-Params-Validate',
-  'EXE_FILES' => [],
-  'LICENSE' => 'perl',
-  'NAME' => 'MooseX::Params::Validate',
-  'PREREQ_PM' => {
-    'Carp' => '0',
-    'Devel::Caller' => '0',
-    'Moose' => '0.58',
-    'Params::Validate' => '0.88',
-    'Scalar::Util' => '0',
-    'Sub::Exporter' => '0'
+  "DISTNAME" => "MooseX-Params-Validate",
+  "EXE_FILES" => [],
+  "LICENSE" => "perl",
+  "NAME" => "MooseX::Params::Validate",
+  "PREREQ_PM" => {
+    "Carp" => 0,
+    "Devel::Caller" => 0,
+    "Moose::Util::TypeConstraints" => 0,
+    "Params::Validate" => 0,
+    "Scalar::Util" => 0,
+    "Sub::Exporter" => 0,
+    "strict" => 0,
+    "warnings" => 0
   },
-  'VERSION' => '0.16',
-  'test' => {
-    'TESTS' => 't/*.t'
+  "VERSION" => "0.17",
+  "test" => {
+    "TESTS" => "t/*.t"
   }
 );
 

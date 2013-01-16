@@ -6,7 +6,6 @@ META.json
 META.yml
 Makefile.PL
 README
-SIGNATURE
 dist.ini
 lib/MooseX/Params/Validate.pm
 t/000_load.t
@@ -25,5 +24,7 @@ t/012_ref_as_first_param.t
 t/release-eol.t
 t/release-no-tabs.t
 t/release-pod-coverage.t
+t/release-pod-linkcheck.t
+t/release-pod-no404s.t
 t/release-pod-spell.t
 t/release-pod-syntax.t

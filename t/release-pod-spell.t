@@ -31,7 +31,9 @@ local $ENV{LC_ALL} = 'C';
 all_pod_files_spelling_ok();
 
 __DATA__
+Rolsky
 Stevan
+coercions
 cpan
 isa
 param

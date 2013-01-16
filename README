@@ -1,11 +1,11 @@
 
 
 This archive contains the distribution MooseX-Params-Validate,
-version 0.16:
+version 0.17:
 
   an extension of Params::Validate using Moose's types
 
-This software is copyright (c) 2011 by Stevan Little <stevan.little@iinteractive.com>.
+This software is copyright (c) 2013 by Stevan Little <stevan.little@iinteractive.com>.
 
 This is free software; you can redistribute it and/or modify it under
 the same terms as the Perl 5 programming language system itself.
