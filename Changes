@@ -1,4 +1,7 @@
-{{$NEXT}}
+0.18 2013-01-16
+    - Fix broken prereq specification in 0.17. Reported by Justin Hunter.
+
+0.17 2013-01-16
     - Fix tests that broke with new hash randomization in 5.17.6. (Dagfinn
       Ilmari Mannsåker)
 

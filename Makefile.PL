@@ -10,13 +10,11 @@ use ExtUtils::MakeMaker 6.30;
 
 my %WriteMakefileArgs = (
   "ABSTRACT" => "an extension of Params::Validate using Moose's types",
-  "AUTHOR" => "Stevan Little <stevan.little\@iinteractive.com>",
+  "AUTHOR" => "Stevan Little <stevan.little\@iinteractive.com>, Dave Rolsky <autarch\@urth.org>",
   "BUILD_REQUIRES" => {
-    "Moose" => 0,
     "Moose::Role" => 0,
-    "Roles::Blah" => 0,
     "Test::Fatal" => 0,
-    "Test::More" => 0,
+    "Test::More" => "0.88",
     "overload" => 0
   },
   "CONFIGURE_REQUIRES" => {
@@ -29,14 +27,15 @@ my %WriteMakefileArgs = (
   "PREREQ_PM" => {
     "Carp" => 0,
     "Devel::Caller" => 0,
+    "Moose" => "0.58",
     "Moose::Util::TypeConstraints" => 0,
-    "Params::Validate" => 0,
+    "Params::Validate" => "0.88",
     "Scalar::Util" => 0,
     "Sub::Exporter" => 0,
     "strict" => 0,
     "warnings" => 0
   },
-  "VERSION" => "0.17",
+  "VERSION" => "0.18",
   "test" => {
     "TESTS" => "t/*.t"
   }

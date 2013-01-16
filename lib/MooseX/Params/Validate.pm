@@ -1,6 +1,6 @@
 package MooseX::Params::Validate;
 {
-  $MooseX::Params::Validate::VERSION = '0.17';
+  $MooseX::Params::Validate::VERSION = '0.18';
 }
 BEGIN {
   $MooseX::Params::Validate::AUTHORITY = 'cpan:STEVAN';
@@ -13,8 +13,10 @@ use Carp 'confess';
 use Devel::Caller 'caller_cv';
 use Scalar::Util 'blessed', 'refaddr', 'reftype';
 
-use Moose::Util::TypeConstraints qw( find_type_constraint class_type role_type );
-use Params::Validate             ();
+use Moose 0.58 ();
+use Moose::Util::TypeConstraints
+    qw( find_type_constraint class_type role_type );
+use Params::Validate 0.88 ();
 use Sub::Exporter -setup => {
     exports => [
         qw( validated_hash validated_list pos_validated_list validate validatep )
@@ -260,7 +262,7 @@ MooseX::Params::Validate - an extension of Params::Validate using Moose's types
 
 =head1 VERSION
 
-version 0.17
+version 0.18
 
 =head1 SYNOPSIS
 
@@ -497,9 +499,19 @@ Please submit bugs to the CPAN RT system at
 http://rt.cpan.org/NoAuth/ReportBug.html?Queue=moosex-params-validate or via
 email at bug-moosex-params-validate@rt.cpan.org.
 
-=head1 AUTHOR
+=head1 AUTHORS
+
+=over 4
+
+=item *
 
 Stevan Little <stevan.little@iinteractive.com>
+
+=item *
+
+Dave Rolsky <autarch@urth.org>
+
+=back
 
 =head1 COPYRIGHT AND LICENSE
 

@@ -1,7 +1,7 @@
 
 
 This archive contains the distribution MooseX-Params-Validate,
-version 0.17:
+version 0.18:
 
   an extension of Params::Validate using Moose's types
 
