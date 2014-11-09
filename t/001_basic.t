@@ -72,6 +72,24 @@ use Test::Fatal;
 
         return $params{foo};
     }
+
+    sub boo {
+        my $self   = shift;
+        my %params = validated_hash(
+            \@_,
+            foo => {
+                isa      => 'Str',
+                optional => 1,
+                depends  => ['bar']
+            },
+            bar => {
+                isa      => 'Str',
+                optional => 1,
+                depends  => ['foo']
+            },
+        );
+        return 'foobar';
+    }
 }
 
 my $foo = Foo->new;
@@ -228,6 +246,20 @@ like(
     exception { $foo->quux( foo => [ 1, 2, 3, 4 ] ) },
     qr/\QThe 'foo' parameter\E.+\Qsome random callback/,
     '... foo parameter additional callback requires that arrayref be 0-2 elements'
+);
+
+is( $foo->boo, 'foobar', '... boo dependent parameters optional' );
+
+like (
+    exception {$foo->boo(foo =>  'foo')},
+    qr/\QParameter 'foo' depends on parameter 'bar'/,
+    '... boo parameter foo depends on bar parameter',
+);
+
+like (
+    exception {$foo->boo(bar =>  'bar')},
+    qr/\QParameter 'bar' depends on parameter 'foo'/,
+    '... boo parameter bar depends on foo parameter',
 );
 
 done_testing();

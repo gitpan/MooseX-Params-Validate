@@ -1,3 +1,4 @@
+#!perl
 
 BEGIN {
   unless ($ENV{RELEASE_TESTING}) {
@@ -6,11 +7,13 @@ BEGIN {
   }
 }
 
+
 use strict;
 use warnings;
-use Test::More;
 
-eval 'use Test::NoTabs';
-plan skip_all => 'Test::NoTabs required' if $@;
-
-all_perl_files_ok();
+use Test::More 0.96 tests => 2;
+use_ok('Test::CPAN::Changes');
+subtest 'changes_ok' => sub {
+    changes_file_ok('Changes');
+};
+done_testing();

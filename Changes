@@ -1,3 +1,6 @@
+0.19 2014-11-08
+    - Added support for the depends parameter. RT #98685. (Hans Staugaard)
+
 0.18 2013-01-16
     - Fix broken prereq specification in 0.17. Reported by Justin Hunter.
 
