@@ -46,3 +46,5 @@ lib
 MooseX
 Params
 Validate
+Exception
+ValidationFailedForTypeConstraint

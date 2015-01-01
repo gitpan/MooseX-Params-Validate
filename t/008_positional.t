@@ -45,7 +45,8 @@ use Test::Fatal;
         my $self = shift;
         return [
             pos_validated_list(
-                \@_, {
+                \@_,
+                {
                     isa => subtype( 'Object' => where { $_->isa('Foo') } ),
                     optional => 1
                 },
@@ -65,15 +66,18 @@ isa_ok( $foo, 'Foo' );
 is( $foo->baz($foo)->[0], $foo, '... first param must be a Foo instance' );
 
 like(
-    exception { $foo->baz(10) }, qr/\QParameter #1 ("10")/,
+    exception { $foo->baz(10) },
+    qr/\QParameter #1/,
     '... the first param in &baz must be a Foo instance'
 );
 like(
-    exception { $foo->baz('foo') }, qr/\QParameter #1 ("foo")/,
+    exception { $foo->baz('foo') },
+    qr/\QParameter #1/,
     '... the first param in &baz must be a Foo instance'
 );
 like(
-    exception { $foo->baz( [] ) }, qr/\QParameter #1/,
+    exception { $foo->baz( [] ) },
+    qr/\QParameter #1/,
     '... the first param in &baz must be a Foo instance'
 );
 
@@ -83,15 +87,18 @@ is(
 );
 
 like(
-    exception { $foo->baz( $foo, 10 ) }, qr/\QParameter #2 ("10")/,
+    exception { $foo->baz( $foo, 10 ) },
+    qr/\QParameter #2/,
     '... the second param in &baz must be do Roles::Blah'
 );
 like(
-    exception { $foo->baz( $foo, 'foo' ) }, qr/\QParameter #2 ("foo")/,
+    exception { $foo->baz( $foo, 'foo' ) },
+    qr/\QParameter #2/,
     '... the second param in &baz must be do Roles::Blah'
 );
 like(
-    exception { $foo->baz( $foo, [] ) }, qr/\QParameter #2/,
+    exception { $foo->baz( $foo, [] ) },
+    qr/\QParameter #2/,
     '... the second param in &baz must be do Roles::Blah'
 );
 
@@ -101,37 +108,44 @@ is(
 );
 
 like(
-    exception { $foo->baz( $foo, $foo, 10 ) }, qr/\QParameter #3 ("10")/,
+    exception { $foo->baz( $foo, $foo, 10 ) },
+    qr/\QParameter #3/,
     '... the third param in &baz must be do Roles::Blah'
 );
 like(
     exception { $foo->baz( $foo, $foo, "foo" ) },
-    qr/\QParameter #3 ("foo")/,
+    qr/\QParameter #3/,
     '... the third param in &baz must be do Roles::Blah'
 );
 like(
-    exception { $foo->baz( $foo, $foo, [] ) }, qr/\QParameter #3/,
+    exception { $foo->baz( $foo, $foo, [] ) },
+    qr/\QParameter #3/,
     '... the third param in &baz must be do Roles::Blah'
 );
 
 like(
-    exception { $foo->bar }, qr/\Q0 parameters were passed/,
+    exception { $foo->bar },
+    qr/\Q0 parameters were passed/,
     '... bar has a required params'
 );
 like(
-    exception { $foo->bar(10) }, qr/\QParameter #1 ("10")/,
+    exception { $foo->bar(10) },
+    qr/\QParameter #1/,
     '... the first param in &bar must be a Foo instance'
 );
 like(
-    exception { $foo->bar('foo') }, qr/\QParameter #1 ("foo")/,
+    exception { $foo->bar('foo') },
+    qr/\QParameter #1/,
     '... the first param in &bar must be a Foo instance'
 );
 like(
-    exception { $foo->bar( [] ) }, qr/\QParameter #1/,
+    exception { $foo->bar( [] ) },
+    qr/\QParameter #1/,
     '... the first param in &bar must be a Foo instance'
 );
 like(
-    exception { $foo->bar() }, qr/\Q0 parameters were passed/,
+    exception { $foo->bar() },
+    qr/\Q0 parameters were passed/,
     '... bar has a required first param'
 );
 
@@ -154,19 +168,23 @@ is_deeply(
 );
 
 like(
-    exception { $foo->bar( $foo, undef ) }, qr/\QParameter #2 (undef)/,
+    exception { $foo->bar( $foo, undef ) },
+    qr/\QParameter #2/,
     '... second param requires a ArrayRef | HashRef'
 );
 like(
-    exception { $foo->bar( $foo, 10 ) }, qr/\QParameter #2 ("10")/,
+    exception { $foo->bar( $foo, 10 ) },
+    qr/\QParameter #2/,
     '... second param requires a ArrayRef | HashRef'
 );
 like(
-    exception { $foo->bar( $foo, 'Foo' ) }, qr/\QParameter #2 ("Foo")/,
+    exception { $foo->bar( $foo, 'Foo' ) },
+    qr/\QParameter #2/,
     '... second param requires a ArrayRef | HashRef'
 );
 like(
-    exception { $foo->bar( $foo, \( my $var ) ) }, qr/\QParameter #2/,
+    exception { $foo->bar( $foo, \( my $var ) ) },
+    qr/\QParameter #2/,
     '... second param requires a ArrayRef | HashRef'
 );
 
@@ -177,19 +195,23 @@ is_deeply(
 );
 
 like(
-    exception { $foo->bar( $foo, {}, undef ) }, qr/\QParameter #3 (undef)/,
+    exception { $foo->bar( $foo, {}, undef ) },
+    qr/\QParameter #3/,
     '... third param a ArrayRef[Int]'
 );
 like(
-    exception { $foo->bar( $foo, {}, 10 ) }, qr/\QParameter #3 ("10")/,
+    exception { $foo->bar( $foo, {}, 10 ) },
+    qr/\QParameter #3/,
     '... third param a ArrayRef[Int]'
 );
 like(
-    exception { $foo->bar( $foo, {}, 'Foo' ) }, qr/\QParameter #3 ("Foo")/,
+    exception { $foo->bar( $foo, {}, 'Foo' ) },
+    qr/\QParameter #3/,
     '... third param a ArrayRef[Int]'
 );
 like(
-    exception { $foo->bar( $foo, {}, \( my $var ) ) }, qr/\QParameter #3/,
+    exception { $foo->bar( $foo, {}, \( my $var ) ) },
+    qr/\QParameter #3/,
     '... third param a ArrayRef[Int]'
 );
 like(

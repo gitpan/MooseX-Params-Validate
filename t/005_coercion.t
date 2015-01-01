@@ -92,11 +92,14 @@ is_deeply(
 
 like(
     exception { $foo->bar( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
-    , qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced' );
+    ,
+    qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced'
+);
 
 like(
     exception { $foo->bar( size1 => 30, size2 => 10, number => 'something' ) }
-    , qr/\QThe 'number' parameter/,
+    ,
+    qr/\QThe 'number' parameter/,
     '... the number param cannot be coerced because there is no coercion defined for Num'
 );
 
@@ -114,11 +117,14 @@ is_deeply(
 
 like(
     exception { $foo->baz( size1 => 30, size2 => [ 1, 2, 3 ], number => 30 ) }
-    , qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced' );
+    ,
+    qr/\QThe 'size2' parameter/, '... the size2 param cannot be coerced'
+);
 
 like(
     exception { $foo->baz( size1 => 30, size2 => 10, number => 'something' ) }
-    , qr/\QThe 'number' parameter/,
+    ,
+    qr/\QThe 'number' parameter/,
     '... the number param cannot be coerced'
 );
 
@@ -147,7 +153,8 @@ is_deeply(
 );
 
 like(
-    exception { $foo->ran_out( [ 1, 2 ], [ 1, 2 ] ) }, qr/\QParameter #2/,
+    exception { $foo->ran_out( [ 1, 2 ], [ 1, 2 ] ) },
+    qr/\QParameter #2/,
     '... did not attempt to coerce the second parameter'
 );
 

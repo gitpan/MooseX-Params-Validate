@@ -16,6 +16,7 @@ use Test::NoTabs;
 
 my @files = (
     'lib/MooseX/Params/Validate.pm',
+    'lib/MooseX/Params/Validate/Exception/ValidationFailedForTypeConstraint.pm',
     't/00-compile.t',
     't/00-report-prereqs.dd',
     't/00-report-prereqs.t',
@@ -32,6 +33,7 @@ my @files = (
     't/010_overloaded.t',
     't/011_allow_extra.t',
     't/012_ref_as_first_param.t',
+    't/013_tc_message.t',
     't/author-eol.t',
     't/author-no-tabs.t',
     't/author-pod-spell.t',
